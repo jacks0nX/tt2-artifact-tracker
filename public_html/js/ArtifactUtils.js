@@ -1,246 +1,315 @@
-﻿var relicsPerSec = 0,
-    relicsBestStage = 0,
-    relicsFarmStage = 0,
-    farmTime = 0,
-    artLvArr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
-    artToLvArr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
-    RELIC_PER_SEC_STORAGE_NAME = 'tt2_relic_per_sec',
+/* global TT2 */
+﻿var RELIC_PER_SEC_STORAGE_NAME = 'tt2_relic_per_sec',
     RELIC_BEST_STORAGE_NAME = 'tt2_relic_at_best',
     FARM_TIME_STORAGE_NAME = 'tt2_farm_time',
     FARM_STAGE_STORAGE_NAME = 'tt2_farm_stage',
     ART_LV_STORAGE_NAME = 'tt2_art_lv_arr',
     ART_TO_LV_STORAGE_NAME = 'tt2_art_to_lv_arr',
-    relicCalcMult1 = 3,
+    SHOW_COLUMN_DAMAGE = false,
+    SHOW_COLUMN_COST = false,
+    relicCalcOffset = -110,
     relicCalcMult2 = 1.5,
     relicCalcBase = 1.21,
     relicCalcExpo = .48,
-    relicCalcOffset = -110;
+    relicCalcMult1 = 3,
+    relicsFarmStage = 0,
+    relicsBestStage = 0,
+    relicsPerSec = 0,
+    ART_TO_LEVEL = {},
+    ART_LEVEL = {},
+    farmTime = 0;
 
 var init = function () {
+    initGlobalVariables();
+    initArtifactsTable();
+    initEvents();
+    refresh();
+};
 
-    //TT2.serialize(RELIC_PER_SEC_STORAGE_NAME, 0);
-    //TT2.serialize(RELIC_BEST_STORAGE_NAME, 0);
-    //TT2.serialize(FARM_TIME_STORAGE_NAME, 0);
-    //TT2.serialize(FARM_STAGE_STORAGE_NAME, 4800);
+var initArtifactsTable = function () {
+    var artifactsDiv = document.getElementById("artifacts"),
+        estimateString,
+        effect1String,
+        effect2String,
+        artifactTable,
+        upgradeString,
+        numberString,
+        damageString,
+        levelString,
+        tierString,
+        iconString,
+        costString,
+        nameString,
+        artifact,
+        maxLevel,
+        valueTo,
+        value,
+        tier,
+        id,
+        i;
 
-    if (TT2.deserialize(ART_LV_STORAGE_NAME)) {
-        artLvArr = TT2.deserialize(ART_LV_STORAGE_NAME);
-    }
-    if (TT2.deserialize(ART_TO_LV_STORAGE_NAME)) {
-        artToLvArr = TT2.deserialize(ART_TO_LV_STORAGE_NAME);
-    }
-
-    if (TT2.deserialize(RELIC_PER_SEC_STORAGE_NAME)) {
-        relicsPerSec = TT2.deserialize(RELIC_PER_SEC_STORAGE_NAME);
-        $('.farm_per_second').val(relicsPerSec);
-        $('.farm_per_hour').val(TT2.numFormat(relicsPerSec * 60 * 60));
-    }
-    if (TT2.deserialize(FARM_STAGE_STORAGE_NAME)) {
-        relicsFarmStage = TT2.deserialize(FARM_STAGE_STORAGE_NAME);
-        $('.farm_stage').val(relicsFarmStage);
-        calcRelicsFromStage();
-    }
-    if (TT2.deserialize(FARM_TIME_STORAGE_NAME)) {
-        farmTime = TT2.deserialize(FARM_TIME_STORAGE_NAME);
-        $('.farm_time').val(getFarmTimeString(farmTime));
-    }
-
-    var artiTable = '<tr>' +
-        '<th>??</th>' +
+    artifactTable = '<tr>' +
+        '<th>#</th>' +
         '<th>Tier</th>' +
-        '<th>Icon</th>' +
-        '<th>Name</th>' +
+        '<th align="left">Icon</th>' +
+        '<th align="left">Name</th>' +
+        '<th align="left">Effect</th>' +
+        '<th align="center">Level</th>' +
         '<th>Effect</th>' +
-        // '<th>Effect<br>per Lv.</th>'+
-        // '<th>Dmg<br>per Lv.</th>'+
-        // '<th>Max<br>Lv.</th>'+
-        '<th>Current<br>Lv.</th>' +
-        '<th>Cur<br>Eff</th>' +
-        '<th>Cur<br>Dmg</th>' +
-        '<th>??</th>' +
-        '<th>??  to</th>' +
-        '<th>??  Cost<span class="tce_mark" title="Based on the data filled in \'Optimiser Page\'">?</span></th>' +
+        (SHOW_COLUMN_DAMAGE ? '<th>Damage</th>' : '') +
+        (SHOW_COLUMN_COST ? '<th>Cost</th>' : '') +
+        '<th>Upgrade</th>' +
+        '<th>Prestiges</th>' +
         '</tr>';
 
-    for (var i = 0; i < TT2.Artifacts.length; i++) {
+    for (i = 0; i < TT2.Artifacts.length; i++) {
+        artifact = TT2.Artifacts[i];
+        maxLevel = artifact.maxLvl;
+        id = artifact.id;
+        value = ART_LEVEL[id];
+        valueTo = ART_TO_LEVEL[id];
+        tier = artifact.tier;
 
-        var a = TT2.Artifacts[i];
-
-        artiTable += '<tr class="tr_color' + a.tier + '">' +
-            '<td align="right">' + (i + 1) + '</td>' +
-            '<td align="middle" class="color' + a.tier + '"><b>' + a.tier + '</b></td>' +
-            '<td><img src="./img/a' + a.id + '.png" width="47" height="47"></td>' +
-            '<td align="left" class="small">' + a.name + '</td>' +
-            '<td class="small">' + a.effect + '</td>' +
-            // '<td>'+ a.addupPerLvl +' <span class="small colorC">'+ a.app +'</span></td>'+
-            // '<td>'+ 100 * a.damPerLvl +'<span class="small colorC"> %</span></td>'+
-            // '<td>'+ (a.maxLvl ? '<span style="color:#d2b96a;">'+ a.maxLvl +'</span>':'8') +'</td>'+
-
-            '<td class="small" style="text-align:center;">' + //Cur Lv input
-            '<input class="art_cur_input" id="ai' + i + '" value="' + artLvArr[i] + '" min="0" max="' + (a.maxLvl ? a.maxLvl : '') + '" step="1" style="width:50px" type="number">' +
-            '<span style="color:#d2b96a;"> / ' + (a.maxLvl ? a.maxLvl : '&infin;') + '</span>' +
-            '</td>' +
-            '<td align="left" class="small td_a">' + //Cur Effect
-            '<span class="a_mark">' + a.pref + '</span> ' +
+        numberString = '<td align="right">' + (i + 1) + '</td>';
+        tierString = '<td align="middle" class="color' + tier + '"><b>' + tier + '</b></td>';
+        iconString = '<td><img src="./img/a' + id + '.png" width="47" height="47"></td>';
+        nameString = '<td align="left" class="small">' + artifact.name + '</td>';
+        effect1String = '<td class="small">' + artifact.effect + '</td>';
+        levelString = '<td class="small" style="text-align:center;">' +
+            '<input class="art_cur_input" id="ai' + i + '" value="' + value + '" min="0" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number">' +
+            '<span style="color:#d2b96a;"> / ' + (maxLevel ? maxLevel : '&infin;') + '</span>' +
+            '</td>';
+        effect2String = '<td align="left" class="small td_a">' +
+            '<span class="a_mark">' + artifact.pref + '</span> ' +
             '<span class="aeff orange" id="aeff' + i + '"></span> ' +
-            '<span class="colorC"> ' + a.app + '</span>' +
-            '</td>' +
-            '<td align="middle" class="td_a">' +
+            '<span class="colorC"> ' + artifact.app + '</span>' +
+            '</td>';
+        damageString = '<td align="middle" class="td_a">' +
             '<span class="a_mark">+</span> ' +
             '<span class="orange adam" id="adam' + i + '"></span>' +
             '<span class="colorC small"> %</span>' +
-            '</td>' + //Cur Dmg
-
-            '<td align="right" class="small td_a">' + //Next Cost
+            '</td>';
+        costString = '<td align="right" class="small td_a">' + //Next Cost
             '<span class="orange art" id="a' + i + '"></span> ' +
             '<img src="./img/relic.png" width="15" height="13" style="vertical-align:middle;">' +
-            '</td>' +
-            '<td class="small" align="left">' + //To Lv Cost
-
-            '<input class="art_to_input" id="atoi' + i + '" value="' + artToLvArr[i] + '" min="1" max="' + (a.maxLvl ? a.maxLvl : '') + '" step="1" style="width:50px" type="number"> ' +
-            '<span>=</span> ' +
+            '</td>';
+        upgradeString = '<td class="small" align="left">' +
+            '<input class="art_to_input" id="atoi' + i + '" value="' + valueTo + '" min="1" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number"> ' +
             '<span class="orange ato" id="ato' + i + '"></span> ' +
             '<img src="./img/relic.png" width="15" height="13" style="vertical-align: middle;">' +
-            '</td>' +
-            '<td align="right" style="text-align:center;">' + //Estimate
+            '</td>';
+        estimateString = '<td align="right" style="text-align:center;">' +
             '<span class="orange atce" id="atce' + i + '"></span> ' +
             '<span class="colorC small"> h</span>' +
             '<span></span><span class="orange atte" id="atte' + i + '"></span><span class="small"> prst</span><span></span>' +
-            '</td>' +
-            '</tr>';
+            '</td>';
+
+        artifactTable += '<tr class="tr_color' + tier + '">';
+        artifactTable += numberString;
+        artifactTable += tierString;
+        artifactTable += iconString;
+        artifactTable += nameString;
+        artifactTable += effect1String;
+        artifactTable += levelString;
+        artifactTable += effect2String;
+        artifactTable += SHOW_COLUMN_DAMAGE ? damageString : '';
+        artifactTable += SHOW_COLUMN_COST ? costString : '';
+        artifactTable += upgradeString;
+        artifactTable += estimateString;
+        artifactTable += '</tr>';
     }
 
-    var artiDiv = document.getElementById("artifacts");
-    artiDiv.innerHTML = artiTable;
+    artifactsDiv.innerHTML = artifactTable;
+};
 
-    //events
-    $('.art_cur_input').bind('change', function (o) {
+var initEvents = function () {
+    $('.art_cur_input').bind('change', function () {
         refresh();
     });
-    $('.art_to_input').bind('change', function (o) {
+    $('.art_to_input').bind('change', function () {
         refresh();
     });
-    $('.farm_stage').bind('blur', function (o) {
+    $('.farm_stage').bind('blur', function () {
         relicsFarmStage = $('.farm_stage')[0].value;
         refresh();
     });
-    $('.farm_time').bind('blur', function (o) {
+    $('.farm_time').bind('blur', function () {
         farmTime = getFarmTimeSeconds();
         refresh();
     });
-    refresh();
-}
+};
+
+var initGlobalVariables = function () {
+    var relicsPerSec = TT2.deserialize(RELIC_PER_SEC_STORAGE_NAME),
+        farmStage = TT2.deserialize(FARM_STAGE_STORAGE_NAME),
+        farmTime = TT2.deserialize(FARM_TIME_STORAGE_NAME),
+        levelTo = TT2.deserialize(ART_TO_LV_STORAGE_NAME),
+        level = TT2.deserialize(ART_LV_STORAGE_NAME);
+
+    this.ART_LEVEL = level || initEmptyLevels();
+    this.ART_TO_LEVEL = levelTo || initEmptyLevels();
+
+    if (relicsPerSec) {
+        this.relicsPerSec = relicsPerSec;
+        $('.farm_per_second').val(relicsPerSec);
+        $('.farm_per_hour').val(TT2.numFormat(relicsPerSec * 60 * 60));
+    }
+
+    if (farmStage) {
+        this.relicsFarmStage = farmStage;
+        $('.farm_stage').val(relicsFarmStage);
+        calcRelicsFromStage();
+    }
+
+    if (farmTime) {
+        this.farmTime = farmTime;
+        $('.farm_time').val(getFarmTimeString(farmTime));
+    }
+};
+
+var initEmptyLevels = function () {
+    var emptyObject = {},
+        artifact,
+        i;
+
+    for (i = 0; i < TT2.Artifacts.length; i++) {
+        artifact = TT2.Artifacts[i];
+        emptyObject[artifact.id] = 0;
+    }
+
+    return emptyObject;
+};
 
 var calcRelicsFromStage = function () {
     var exponentialTerm = relicCalcMult1 * Math.pow(relicCalcBase, Math.pow(relicsFarmStage, relicCalcExpo)),
         firstOrderTerm = relicCalcMult2 * (parseInt(relicsFarmStage) + parseInt(relicCalcOffset)),
         t = Math.max(Math.ceil(exponentialTerm + firstOrderTerm), 0),
-        bos = artLvArr[0],
+        bos = ART_LEVEL[1],
         e = .05 * parseInt(bos),
         l = t + (a = Math.max(Math.ceil(t * e), 0));
 
     relicsBestStage = l;
     $('.farm_relics').val(relicsBestStage);
     return l;
-}
+};
 
 var calcRelicsPerSecond = function () {
     var relicsPerSec = relicsBestStage / getFarmTimeSeconds();
     $('.farm_per_second').val(relicsPerSec);
     $('.farm_per_hour').val(TT2.numFormat(relicsPerSec * 60 * 60));
     return relicsPerSec;
-}
+};
 
 var getFarmTimeSeconds = function () {
     var time = $('.farm_time')[0].value.split(':');
     farmTime = (time[1] * 60) + (time[0] * 60 * 60);
     return farmTime;
-}
+};
 
 var getFarmTimeString = function (time) {
+    var text,
+        h,
+        m;
+
     time = Number(time);
-    var h = Math.floor(time / 3600);
-    var m = Math.floor(time % 3600 / 60);
-    var text = ('0' + h).slice(-2) + ":" + ('0' + m).slice(-2);
+    h = Math.floor(time / 3600);
+    m = Math.floor(time % 3600 / 60);
+    text = ('0' + h).slice(-2) + ":" + ('0' + m).slice(-2);
     $('.farm_time').text(text);
     return text;
-}
+};
 
 var refresh = function () {
-    var artNum = 0;
-    var farmStage = $('.farm_stage')[0].value;
-    for (var i = 0; i < TT2.Artifacts.length; i++) {
+    var farmStage = $('.farm_stage')[0].value,
+        artNum = 0,
+        currentInputField,
+        currentInputLevel,
+        efficiencyField,
+        costToUpgrade,
+        damageField,
+        artifactMax,
+        costField,
+        artifact,
+        i;
 
-        var ipt = $('.art_cur_input')[i],
-            lv = ipt.value ? +ipt.value : 0,
-            max = TT2.Artifacts[i].maxLvl,
-            relicDom1 = $('#a' + i),
-            effDom = $('#aeff' + i),
-            dmgDom = $('#adam' + i);
+    for (i = 0; i < TT2.Artifacts.length; i++) {
+        artifact = TT2.Artifacts[i];
+        currentInputField = $('.art_cur_input')[i];
+        currentInputLevel = currentInputField.value ? +currentInputField.value : 0;
+        artifactMax = artifact.maxLvl;
+        costField = $('#a' + i);
+        efficiencyField = $('#aeff' + i);
+        damageField = $('#adam' + i);
 
-        if (lv >= 0) {
-            var relicNum = TT2.artifactUpg1(i, lv);
+        if (currentInputLevel >= 0) {
+            costToUpgrade = TT2.artifactUpg1(i, currentInputLevel);
 
-            if (max > 0 && lv >= max) {
-                lv = max;
-                ipt.value = lv;
-                relicDom1.html('<span class="small white">MAX</span>');
+            if (artifactMax && currentInputLevel >= artifactMax) {
+                currentInputLevel = artifactMax;
+                currentInputField.value = currentInputLevel;
+                costField.html('<span class="small white">MAX</span>');
             } else {
-                if (lv == 0) {
-                    relicDom1.text('-');
+                if (currentInputLevel == 0) {
+                    costField.text('-');
                 } else {
-                    relicDom1.text(TT2.numFormat(relicNum));
+                    costField.text(TT2.numFormat(costToUpgrade));
                 }
 
             }
-            effDom.text(new Number(parseFloat(TT2.artifactEff(i, lv))).toFixed(2));
-            dmgDom.text(TT2.numFormat(TT2.artifactDmg(i, lv) * 100));
+            efficiencyField.text(new Number(parseFloat(TT2.artifactEff(i, currentInputLevel))).toFixed(2));
+            damageField.text(TT2.numFormat(TT2.artifactDmg(i, currentInputLevel) * 100));
             upgToRefresh(i);
 
-            artLvArr[i] = lv;
+            ART_LEVEL[artifact.id] = currentInputLevel;
         } else {
-            relicDom1.text('-');
-            effDom.text('');
-            dmgDom.text('');
+            costField.text('-');
+            efficiencyField.text('');
+            damageField.text('');
         }
-        if (lv > 0) {
+
+        if (currentInputLevel > 0) {
             artNum += 1;
         }
     }
+
     refreshArtNum(artNum);
     calcRelicsFromStage();
-    TT2.serialize(ART_LV_STORAGE_NAME, artLvArr);
-    TT2.serialize(ART_TO_LV_STORAGE_NAME, artToLvArr);
+    saveGlobalVariables();
+};
+
+var saveGlobalVariables = function () {
+    TT2.serialize(ART_LV_STORAGE_NAME, ART_LEVEL);
+    TT2.serialize(ART_TO_LV_STORAGE_NAME, ART_TO_LEVEL);
     TT2.serialize(FARM_STAGE_STORAGE_NAME, farmStage);
     TT2.serialize(FARM_TIME_STORAGE_NAME, getFarmTimeSeconds());
     TT2.serialize(RELIC_PER_SEC_STORAGE_NAME, calcRelicsPerSecond());
-}
+};
 
 var upgToRefresh = function (i) {
-    var ipt1 = $('#ai' + i)[0],
+    var artifact = TT2.Artifacts[i],
+        ipt1 = $('#ai' + i)[0],
         ipt2 = $('#atoi' + i)[0],
-        cur = ipt1.value ? +ipt1.value : 0,
-        to = ipt2.value ? +ipt2.value : 0,
-        max = TT2.Artifacts[i].maxLvl,
+        currentLevel = ipt1.value || 0,
+        levelTo = ipt2.value || 0,
+        max = artifact.maxLvl,
         relicDom2 = $('#ato' + i),
-        relic = TT2.artifactUpgTo(i, cur, to);
+        upgradeCost = TT2.artifactUpgTo(i, currentLevel, levelTo);
 
-    if (max > 0 && to > max) {
+    if (max && levelTo > max) {
         ipt2.value = max;
-        to = max;
+        levelTo = max;
     }
 
-    relic = TT2.artifactUpgTo(i, cur, to);
-    artToLvArr[i] = to;
+    ART_TO_LEVEL[artifact.id] = levelTo;
 
-    if (relic > 0) {
-        relicDom2.text(TT2.numFormat(relic));
+    if (upgradeCost > 0) {
+        relicDom2.text(TT2.numFormat(upgradeCost));
         if (relicsPerSec > 0) {
             var t = 0,
                 num = 0;
 
             if (relicsBestStage > 0) {
-                num = Math.ceil(relic / relicsBestStage);
+                num = Math.ceil(upgradeCost / relicsBestStage);
                 t = num * farmTime / 3600;
             }
 
@@ -249,7 +318,7 @@ var upgToRefresh = function (i) {
         }
 
         if (relicsBestStage > 0) {
-            var num = Math.ceil(relic / relicsBestStage);
+            var num = Math.ceil(upgradeCost / relicsBestStage);
             $('#atte' + i).text(TT2.numFormat(num));
         }
 
@@ -258,5 +327,6 @@ var upgToRefresh = function (i) {
         $('#atce' + i).text('');
         $('#atte' + i).text('');
     }
-}
+};
+
 init();
