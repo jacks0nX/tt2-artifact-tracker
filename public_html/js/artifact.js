@@ -33,6 +33,7 @@ var init = function () {
     if (TT2.deserialize(RELIC_PER_SEC_STORAGE_NAME)) {
         relicsPerSec = TT2.deserialize(RELIC_PER_SEC_STORAGE_NAME);
         $('.farm_per_second').val(relicsPerSec);
+        $('.farm_per_hour').val(TT2.numFormat(relicsPerSec * 60 * 60));
     }
     if (TT2.deserialize(FARM_STAGE_STORAGE_NAME)) {
         relicsFarmStage = TT2.deserialize(FARM_STAGE_STORAGE_NAME);
@@ -161,6 +162,7 @@ var calcRelicsFromStage = function () {
 var calcRelicsPerSecond = function () {
     var relicsPerSec = relicsBestStage / getFarmTimeSeconds();
     $('.farm_per_second').val(relicsPerSec);
+    $('.farm_per_hour').val(TT2.numFormat(relicsPerSec * 60 * 60));
     return relicsPerSec;
 }
 

@@ -3,42 +3,44 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=1200px,minimum-scale=0.3,maximum-scale=1.0,user-scalable=yes"/>
     <title>TT2 Artifacts Calculator</title>
-    <link rel="stylesheet" type="text/css" href="./css/main.css?201703201535" />
+    <link rel="stylesheet" type="text/css" href="./css/main.css" />
+    <link rel="stylesheet" href="css/main.css" type="text/css">
 </head>
 
 <body >
     <div id="mainbody">
-				
+
         <div class="block">
             <div class="block_title" style="display:none">Artifact Table</div>
             <table id="artifacts" border="0" cellspacing="0" cellpadding="0"></table>
         </div>
-		
-		<div class="block">
-			<label>
-				<div class="block_title" >Farming</div>
-				<table border="0">
-					<tr><td>Stage:</td><td><input type="number" min="1" class="farm_stage"></td></tr>
-					<tr><td>Relics:</td><td><input type="number" min="1" class="farm_relics" readonly></td></tr>
-					<tr><td>Time:</td><td><input type="time" class="farm_time"></td></tr>
-					<tr><td>Relics/s:</td><td><input type="number" class="farm_per_second" readonly></td></tr>
-				</table>
-			
-			</label>
-		</div>
-		
+
+        <div class="block">
+            <div class="block_title" >Farming</div>
+
+            <label>
+                <table border="0">
+                    <tr><td>Stage:</td><td><input type="number" min="1" class="farm_stage"></td></tr>
+                    <tr><td>Relics:</td><td><input type="number" min="1" class="farm_relics" readonly></td></tr>
+                    <tr><td>Time:</td><td><input type="time" class="farm_time"></td></tr>
+                    <tr><td>Relics/s:</td><td><input type="number" class="farm_per_second" readonly></td></tr>
+                    <tr><td>Relics/h:</td><td><input type="text" class="farm_per_hour" readonly></td></tr>
+                </table>
+            </label>
+        </div>
+        
         <div class="block">
             <div class="block_title">New Artifact Cost</div>
-            
+
             <label>
                 <span>You have <b class="orange" id="art_num">0</b> Artifacts Collected</span><br>
                 <span class="art_next_label">The next artifact will cost you <b class="orange" id="art_next_relic">1</b> relics. It'll take you <b class="orange" id="art_next_time">-</b> h ( <b class="orange" id="art_next_rest">-</b> prestiges ) according to your current farming efficiency.</span>
             </label>
-			
+
             <div class="block_fml">
                 <div><span class="small"><b>Next artifact cost</b> = (OwnedArtifacts + 1) * 1.31<sup>OwnedArtifacts + 1</sup></span></div>
             </div>
-			
+
             <table id="arti_cost" border="0" cellspacing="0" cellpadding="0">
                 <thead>
                     <tr>
@@ -54,111 +56,141 @@
                 </thead>
                 <tbody>
                     <tr>
-                    <td align="left">1</td>
-                    <td align="left">1</td>
-                    <td align="left">11</td>
-                    <td align="left">214</td>
-                    <td align="left">21</td>
-                    <td align="left">6094</td>
-                    <td align="left">31</td>
-                    <td align="left">133897</td>
+                        <td align="left">1</td>
+                        <td align="left">1</td>
+                        <td align="left">2</td>
+                        <td align="left">3</td>
+                        <td align="left">3</td>
+                        <td align="left">6</td>
+                        <td align="left">4</td>
+                        <td align="left">11</td>
                     </tr>
                     <tr>
-                    <td align="left">2</td>
-                    <td align="left">3</td>
-                    <td align="left">12</td>
-                    <td align="left">306</td>
-                    <td align="left">22</td>
-                    <td align="left">8363</td>
-                    <td align="left">32</td>
-                    <td align="left">181063</td>
+                        <td align="left">5</td>
+                        <td align="left">19</td>
+                        <td align="left">6</td>
+                        <td align="left">30</td>
+                        <td align="left">7</td>
+                        <td align="left">46</td>
+                        <td align="left">8</td>
+                        <td align="left">69</td>
                     </tr>
                     <tr>
-                    <td align="left">3</td>
-                    <td align="left">6</td>
-                    <td align="left">13</td>
-                    <td align="left">434</td>
-                    <td align="left">23</td>
-                    <td align="left">11454</td>
-                    <td align="left">33</td>
-                    <td align="left">244605</td>
+                        <td align="left">9</td>
+                        <td align="left">102</td>
+                        <td align="left">10</td>
+                        <td align="left">148</td>
+                        <td align="left">11</td>
+                        <td align="left">214</td>
+                        <td align="left">12</td>
+                        <td align="left">306</td>
                     </tr>
                     <tr>
-                    <td align="left">4</td>
-                    <td align="left">11</td>
-                    <td align="left">14</td>
-                    <td align="left">613</td>
-                    <td align="left">24</td>
-                    <td align="left">15657</td>
-                    <td align="left">34</td>
-                    <td align="left">330143</td>
+                        <td align="left">13</td>
+                        <td align="left">434</td>
+                        <td align="left">14</td>
+                        <td align="left">613</td>
+                        <td align="left">15</td>
+                        <td align="left">861</td>
+                        <td align="left">16</td>
+                        <td align="left">1203</td>
                     </tr>
                     <tr>
-                    <td align="left">5</td>
-                    <td align="left">19</td>
-                    <td align="left">15</td>
-                    <td align="left">861</td>
-                    <td align="left">25</td>
-                    <td align="left">21365</td>
-                    <td align="left">35</td>
-                    <td align="left">445208</td>
+                        <td align="left">17</td>
+                        <td align="left">1675</td>
+                        <td align="left">18</td>
+                        <td align="left">2323</td>
+                        <td align="left">19</td>
+                        <td align="left">3212</td>
+                        <td align="left">20</td>
+                        <td align="left">4430</td>
                     </tr>
                     <tr>
-                    <td align="left">6</td>
-                    <td align="left">30</td>
-                    <td align="left">16</td>
-                    <td align="left">1203</td>
-                    <td align="left">26</td>
-                    <td align="left">29108</td>
-                    <td align="left">36</td>
-                    <td align="left">599886</td>
+                        <td align="left">21</td>
+                        <td align="left">6094</td>
+                        <td align="left">22</td>
+                        <td align="left">8363</td>
+                        <td align="left">23</td>
+                        <td align="left">11454</td>
+                        <td align="left">24</td>
+                        <td align="left">15657</td>
                     </tr>
                     <tr>
-                    <td align="left">7</td>
-                    <td align="left">46</td>
-                    <td align="left">17</td>
-                    <td align="left">1675</td>
-                    <td align="left">27</td>
-                    <td align="left">39599</td>
-                    <td align="left">37</td>
-                    <td align="left">807680</td>
+                        <td align="left">25</td>
+                        <td align="left">21365</td>
+                        <td align="left">26</td>
+                        <td align="left">29108</td>
+                        <td align="left">27</td>
+                        <td align="left">39599</td>
+                        <td align="left">28</td>
+                        <td align="left">53796</td>
                     </tr>
                     <tr>
-                    <td align="left">8</td>
-                    <td align="left">69</td>
-                    <td align="left">18</td>
-                    <td align="left">2323</td>
-                    <td align="left">28</td>
-                    <td align="left">53796</td>
-                    <td align="left">38</td>
-                    <td align="left">1086657</td>
+                        <td align="left">29</td>
+                        <td align="left">72990</td>
+                        <td align="left">30</td>
+                        <td align="left">98914</td>
+                        <td align="left">31</td>
+                        <td align="left">133897</td>
+                        <td align="left">32</td>
+                        <td align="left">181063</td>
                     </tr>
                     <tr>
-                    <td align="left">9</td>
-                    <td align="left">102</td>
-                    <td align="left">19</td>
-                    <td align="left">3212</td>
-                    <td align="left">29</td>
-                    <td align="left">72990</td>
-                    <td align="left">39</td>
-                    <td align="left"></td>
+                        <td align="left">33</td>
+                        <td align="left">244605</td>
+                        <td align="left">34</td>
+                        <td align="left">330143</td>
+                        <td align="left">35</td>
+                        <td align="left">445208</td>
+                        <td align="left">36</td>
+                        <td align="left">599886</td>
                     </tr>
                     <tr>
-                    <td align="left">10</td>
-                    <td align="left">148</td>
-                    <td align="left">20</td>
-                    <td align="left">4430</td>
-                    <td align="left">30</td>
-                    <td align="left">98914</td>
-                    <td align="left">40</td>
-                    <td align="left">1960000</td>
+                        <td align="left">37</td>
+                        <td align="left">807680</td>
+                        <td align="left">38</td>
+                        <td align="left">1086657</td>
+                        <td align="left">39</td>
+                        <td align="left">1460982</td>
+                        <td align="left">40</td>
+                        <td align="left">1962961.6617629046</td>
+                    </tr>
+                    <tr>
+                        <td align="left">41</td>
+                        <td align="left">2635766.7713321405</td>
+                        <td align="left">42</td>
+                        <td align="left">3537070.4331388874</td>
+                        <td align="left">43</td>
+                        <td align="left">4743885.178540799</td>
+                        <td align="left">44</td>
+                        <td align="left">6359012.597467247</td>
+                    </tr>
+                    <tr>
+                        <td align="left">45</td>
+                        <td align="left">8519631.650470324</td>
+                        <td align="left">46</td>
+                        <td align="left">11408733.405718705</td>
+                        <td align="left">47</td>
+                        <td align="left">15270341.647610886</td>
+                        <td align="left">48</td>
+                        <td align="left">20429767.71918665</td>
+                    </tr>
+                    <tr>
+                        <td align="left">49</td>
+                        <td align="left">27320558.12280398</td>
+                        <td align="left">50</td>
+                        <td align="left">36520337.89885022</td>
+                        <td align="left">51</td>
+                        <td align="left">48798475.500443675</td>
+                        <td align="left">52</td>
+                        <td align="left"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-	
-<script src="./js/jquery-1.10.2.min.js" type="text/javascript"></script>
-<script src="./js/data.js" type="text/javascript"></script>
-<script src="./js/artifact.js" type="text/javascript"></script>
+
+    <script src="./js/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="./js/data.js" type="text/javascript"></script>
+    <script src="./js/artifact.js" type="text/javascript"></script>
 </body>
