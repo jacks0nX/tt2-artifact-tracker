@@ -22,7 +22,7 @@ TT2.Artifacts = [
     {tier: 'B', id: 16, name: 'Amethyst Staff', maxLvl: 0, addupPerLvl: 0.02, damPerLvl: 0.3, costCoef: 0.65, costExp: 2, offset: 1, effect: 'Slash Boost', pref: '&#10005', app: ''},
     // C
     {tier: 'C', id: 6, name: 'Fruit of Eden', maxLvl: 0, addupPerLvl: 0.1, damPerLvl: 0.3, costCoef: 0.7, costExp: 2, offset: 1, effect: 'Pet Damage', pref: '&#10005', app: ''},
-    {tier: 'C', id: 17, name: 'Royal Toxin', maxLvl: 0, addupPerLvl: 0.1, damPerLvl: 0.5, costCoef: 0.7, costExp: 1.8, offset: 1, effect: 'Clan Ship Damage', pref: '&#10005', app: ''},
+    {tier: 'C', id: 17, name: 'Royal Toxin', maxLvl: 0, addupPerLvl: 0.1, damPerLvl: 0.5, costCoef: 0.7, costExp: 1.8, offset: 1, effect: 'Deadly Strike Effect', pref: '&#10005', app: ''},
     {tier: 'C', id: 8, name: 'The Sword of Storms', maxLvl: 0, addupPerLvl: 0.15, damPerLvl: 0.6, costCoef: 0.7, costExp: 1.7, offset: 1, effect: 'Melee Hero Damage', pref: '&#10005', app: ''},
     {tier: 'C', id: 7, name: 'Charm of the Ancient', maxLvl: 0, addupPerLvl: 0.15, damPerLvl: 0.6, costCoef: 0.7, costExp: 1.7, offset: 1, effect: 'Spell Hero Damage', pref: '&#10005', app: ''},
     {tier: 'C', id: 37, name: 'Drunken Hammer', maxLvl: 0, addupPerLvl: 0.05, damPerLvl: 0.3, costCoef: 0.6, costExp: 1.7, offset: 1, effect: 'Tap Damage', pref: '&#10005', app: ''},
