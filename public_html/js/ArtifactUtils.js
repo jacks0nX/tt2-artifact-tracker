@@ -129,21 +129,6 @@ var init = function () {
         refresh();
     });
     refresh();
-
-    var artiCostTd = $('#arti_cost td, #arti_cost th');
-    for (var i = 0; i < artiCostTd.length; i++) {
-        if (i % 2 == 0) {
-            $(artiCostTd[i]).addClass('arti_cost_even');
-        } else {
-            var td = $(artiCostTd[i]),
-                value = +td.text();
-
-            td.addClass('arti_cost_odd');
-            if (value) {
-                td.text(TT2.numFormat(value));
-            }
-        }
-    }
 }
 
 var calcRelicsFromStage = function () {
@@ -229,31 +214,6 @@ var refresh = function () {
     TT2.serialize(FARM_STAGE_STORAGE_NAME, farmStage);
     TT2.serialize(FARM_TIME_STORAGE_NAME, getFarmTimeSeconds());
     TT2.serialize(RELIC_PER_SEC_STORAGE_NAME, calcRelicsPerSecond());
-}
-
-var refreshArtNum = function (n) {
-    $('#art_num').text(n);
-
-    if (n == 38) {
-        $('.art_next_label').hide();
-    } else {
-        $('.art_next_label').show();
-        var r = (n + 1) * Math.pow(1.31, n + 1);
-        $('#art_next_relic').text(TT2.numFormat(Math.round(r)));
-
-        if (relicsPerSec > 0) {
-            var t = 0,
-                num = 0;
-
-            if (relicsBestStage > 0) {
-                num = Math.ceil(r / relicsBestStage);
-                t = num * farmTime / 3600;
-            }
-
-            $('#art_next_time').text(t.toFixed(2));
-            $('#art_next_rest').text(TT2.numFormat(num));
-        }
-    }
 }
 
 var upgToRefresh = function (i) {
