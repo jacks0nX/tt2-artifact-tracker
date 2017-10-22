@@ -1,23 +1,6 @@
-/* global TT2 */
-﻿var RELIC_PER_SEC_STORAGE_NAME = 'tt2_relic_per_sec',
-    RELIC_BEST_STORAGE_NAME = 'tt2_relic_at_best',
-    FARM_TIME_STORAGE_NAME = 'tt2_farm_time',
-    FARM_STAGE_STORAGE_NAME = 'tt2_farm_stage',
-    ART_LV_STORAGE_NAME = 'tt2_art_lv_arr',
-    ART_TO_LV_STORAGE_NAME = 'tt2_art_to_lv_arr',
-    SHOW_COLUMN_DAMAGE = false,
-    SHOW_COLUMN_COST = false,
-    relicCalcOffset = -110,
-    relicCalcMult2 = 1.5,
-    relicCalcBase = 1.21,
-    relicCalcExpo = .48,
-    relicCalcMult1 = 3,
-    relicsFarmStage = 0,
-    relicsBestStage = 0,
-    relicsPerSec = 0,
-    ART_TO_LEVEL = {},
-    ART_LEVEL = {},
-    farmTime = 0;
+/* global TT2, ARTIFACT_TO_LEVEL, RELICS_PER_SEC, ARTIFACT_LEVEL, RELICS_BEST_STAGE */
+﻿var SHOW_COLUMN_DAMAGE = false,
+    SHOW_COLUMN_COST = false;
 
 var init = function () {
     initGlobalVariables();
@@ -66,8 +49,8 @@ var initArtifactsTable = function () {
         artifact = TT2.Artifacts[i];
         maxLevel = artifact.maxLvl;
         id = artifact.id;
-        value = ART_LEVEL[id];
-        valueTo = ART_TO_LEVEL[id];
+        value = ARTIFACT_LEVEL[id];
+        valueTo = ARTIFACT_TO_LEVEL[id];
         tier = artifact.tier;
 
         numberString = '<td align="right">' + (i + 1) + '</td>';
@@ -130,41 +113,13 @@ var initEvents = function () {
         refresh();
     });
     $('.farm_stage').bind('blur', function () {
-        relicsFarmStage = $('.farm_stage')[0].value;
+        relicsFarmStage = farmStageInputValue();
         refresh();
     });
     $('.farm_time').bind('blur', function () {
-        farmTime = getFarmTimeSeconds();
+        FARM_TIME = getFarmTimeSeconds();
         refresh();
     });
-};
-
-var initGlobalVariables = function () {
-    var relicsPerSec = TT2.deserialize(RELIC_PER_SEC_STORAGE_NAME),
-        farmStage = TT2.deserialize(FARM_STAGE_STORAGE_NAME),
-        farmTime = TT2.deserialize(FARM_TIME_STORAGE_NAME),
-        levelTo = TT2.deserialize(ART_TO_LV_STORAGE_NAME),
-        level = TT2.deserialize(ART_LV_STORAGE_NAME);
-
-    this.ART_LEVEL = level || initEmptyLevels();
-    this.ART_TO_LEVEL = levelTo || initEmptyLevels();
-
-    if (relicsPerSec) {
-        this.relicsPerSec = relicsPerSec;
-        $('.farm_per_second').val(relicsPerSec);
-        $('.farm_per_hour').val(TT2.numFormat(relicsPerSec * 60 * 60));
-    }
-
-    if (farmStage) {
-        this.relicsFarmStage = farmStage;
-        $('.farm_stage').val(relicsFarmStage);
-        calcRelicsFromStage();
-    }
-
-    if (farmTime) {
-        this.farmTime = farmTime;
-        $('.farm_time').val(getFarmTimeString(farmTime));
-    }
 };
 
 var initEmptyLevels = function () {
@@ -178,45 +133,6 @@ var initEmptyLevels = function () {
     }
 
     return emptyObject;
-};
-
-var calcRelicsFromStage = function () {
-    var exponentialTerm = relicCalcMult1 * Math.pow(relicCalcBase, Math.pow(relicsFarmStage, relicCalcExpo)),
-        firstOrderTerm = relicCalcMult2 * (parseInt(relicsFarmStage) + parseInt(relicCalcOffset)),
-        t = Math.max(Math.ceil(exponentialTerm + firstOrderTerm), 0),
-        bos = ART_LEVEL[1],
-        e = .05 * parseInt(bos),
-        l = t + (a = Math.max(Math.ceil(t * e), 0));
-
-    relicsBestStage = l;
-    $('.farm_relics').val(relicsBestStage);
-    return l;
-};
-
-var calcRelicsPerSecond = function () {
-    var relicsPerSec = relicsBestStage / getFarmTimeSeconds();
-    $('.farm_per_second').val(relicsPerSec);
-    $('.farm_per_hour').val(TT2.numFormat(relicsPerSec * 60 * 60));
-    return relicsPerSec;
-};
-
-var getFarmTimeSeconds = function () {
-    var time = $('.farm_time')[0].value.split(':');
-    farmTime = (time[1] * 60) + (time[0] * 60 * 60);
-    return farmTime;
-};
-
-var getFarmTimeString = function (time) {
-    var text,
-        h,
-        m;
-
-    time = Number(time);
-    h = Math.floor(time / 3600);
-    m = Math.floor(time % 3600 / 60);
-    text = ('0' + h).slice(-2) + ":" + ('0' + m).slice(-2);
-    $('.farm_time').text(text);
-    return text;
 };
 
 var refresh = function () {
@@ -263,7 +179,7 @@ var refresh = function () {
             efficiencyField.text(new Number(parseFloat(TT2.artifactEff(i, currentInputLevel))).toFixed(2));
             damageField.text(TT2.numFormat(TT2.artifactDmg(i, currentInputLevel) * 100));
             upgToRefresh(i);
-            ART_LEVEL[artifact.id] = currentInputLevel;
+            ARTIFACT_LEVEL[artifact.id] = currentInputLevel;
         } else {
             costField.text('-');
             efficiencyField.text('');
@@ -278,15 +194,6 @@ var refresh = function () {
     refreshArtNum(artNum);
     calcRelicsFromStage();
     saveGlobalVariables();
-};
-
-var saveGlobalVariables = function () {
-    var farmStage = $('.farm_stage')[0].value;
-    TT2.serialize(ART_LV_STORAGE_NAME, ART_LEVEL);
-    TT2.serialize(ART_TO_LV_STORAGE_NAME, ART_TO_LEVEL);
-    TT2.serialize(FARM_STAGE_STORAGE_NAME, farmStage);
-    TT2.serialize(FARM_TIME_STORAGE_NAME, getFarmTimeSeconds());
-    TT2.serialize(RELIC_PER_SEC_STORAGE_NAME, calcRelicsPerSecond());
 };
 
 var upgToRefresh = function (i) {
@@ -304,25 +211,25 @@ var upgToRefresh = function (i) {
         levelTo = max;
     }
 
-    ART_TO_LEVEL[artifact.id] = levelTo;
+    ARTIFACT_TO_LEVEL[artifact.id] = levelTo;
 
     if (upgradeCost > 0) {
         relicDom2.text(TT2.numFormat(upgradeCost));
-        if (relicsPerSec > 0) {
+        if (RELICS_PER_SEC > 0) {
             var t = 0,
                 num = 0;
 
-            if (relicsBestStage > 0) {
-                num = Math.ceil(upgradeCost / relicsBestStage);
-                t = num * farmTime / 3600;
+            if (RELICS_BEST_STAGE > 0) {
+                num = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
+                t = num * FARM_TIME / 3600;
             }
 
             $('#atce' + i).text(t.toFixed(2));
             $('#atte' + i).text(TT2.numFormat(num));
         }
 
-        if (relicsBestStage > 0) {
-            var num = Math.ceil(upgradeCost / relicsBestStage);
+        if (RELICS_BEST_STAGE > 0) {
+            var num = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
             $('#atte' + i).text(TT2.numFormat(num));
         }
 

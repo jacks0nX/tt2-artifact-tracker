@@ -1,5 +1,4 @@
-/* global TT2 */
-//var ARTIFACTS_AMOUNT = 40,
+/* global TT2, FARM_TIME, RELICS_PER_SEC, RELICS_BEST_STAGE */
 var ARTIFACTS_AMOUNT = TT2.Artifacts.length,
     ARTIFACTS_PER_ROW = 4,
     COLUMNS_PER_ROW = ARTIFACTS_PER_ROW * 2;
@@ -17,13 +16,13 @@ var refreshArtNum = function (currentArtifact) {
     $('.art_next_label').show();
     $('#art_next_relic').text(nextCostFormatted);
 
-    if (relicsPerSec && relicsPerSec > 0) {
+    if (RELICS_PER_SEC && RELICS_PER_SEC > 0) {
         var amountTime = 0,
             amountPrestiges = 0;
 
-        if (relicsBestStage > 0) {
-            amountPrestiges = Math.ceil(nextCost / relicsBestStage);
-            amountTime = amountPrestiges * farmTime / 3600;
+        if (RELICS_BEST_STAGE > 0) {
+            amountPrestiges = Math.ceil(nextCost / RELICS_BEST_STAGE);
+            amountTime = amountPrestiges * FARM_TIME / 3600;
         }
 
         amountPrestiges = TT2.numFormat(amountPrestiges);
