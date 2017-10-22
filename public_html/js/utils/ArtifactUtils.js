@@ -127,14 +127,14 @@ var initEvents = function () {
     $('.clear_to_button').bind('click', function (event) {
         var target = event.target,
             targetId = target.id,
-            atoiId = targetId.substring(targetId.length - 1, targetId.length);
+            atoiId = targetId.substring(2, targetId.length);
         $('#atoi' + atoiId).val(0);
         refresh();
     });
     $('.add_to_button').bind('click', function (event) {
         var target = event.target,
             targetId = target.id,
-            id = targetId.substring(targetId.length - 1, targetId.length),
+            id = targetId.substring(2, targetId.length),
             toField = $('#atoi' + id),
             levelField = $('#ai' + id),
             currentLevel = +levelField.val(),
