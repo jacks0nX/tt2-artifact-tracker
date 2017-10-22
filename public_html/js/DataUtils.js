@@ -1,16 +1,16 @@
 var TT2 = {
     getWeaponMtp: function (i, lv, lwLv) {
-        if (lv == 0)
+        if (lv === 0)
             return 1;
         return this.EquipWeapon[i].base * (lv + 1) * this.EquipWeapon[i].inc * this.artifactEff(16, lwLv);
     },
     getHatMtp: function (i, lv, lwLv) {
-        if (lv == 0)
+        if (lv === 0)
             return 1;
         return this.EquipHat[i].base * (lv + 1) * this.EquipHat[i].inc * this.artifactEff(17, lwLv);
     },
     getSuitMtp: function (i, lv, lwLv) {
-        if (lv == 0)
+        if (lv === 0)
             return 1;
         return this.EquipSuit[i].base * (lv + 1) * this.EquipSuit[i].inc * this.artifactEff(18, lwLv);
     },
@@ -18,24 +18,24 @@ var TT2 = {
         var aura = this.EquipAura[i];
         switch (aura.type) {
             case 'Chesterson Chance':
-                if (lv == 0)
+                if (lv ===0)
                     return 0;
                 return aura.base + lv * aura.inc;
                 break;
             case 'Critical Chance':
-                if (lv == 0)
+                if (lv === 0)
                     return 0;
                 return aura.base + lv * aura.inc;
                 break;
             case 'Titan HP':
-                if (lv == 0)
+                if (lv === 0)
                     return 1;
                 return aura.base - lv * aura.inc;
                 break;
         }
     },
     getSlashMtp: function (i, lv, lwLv) {
-        if (lv == 0)
+        if (lv === 0)
             return 1;
         return this.EquipSlash[i].base * (lv + 1) * this.EquipSlash[i].inc * this.artifactEff(15, lwLv);
     },
@@ -100,7 +100,7 @@ var TT2 = {
                 z = 'z';
             for (; myNum > 1000; myNum /= 1000) {
                 L2 = String.fromCharCode(L2.charCodeAt() + 1);
-                if (L2 == String.fromCharCode(z.charCodeAt() + 1)) {
+                if (L2 === String.fromCharCode(z.charCodeAt() + 1)) {
                     L2 = 'a';
                     L1 = String.fromCharCode(L1.charCodeAt() + 1);
                 }
@@ -131,7 +131,7 @@ var TT2 = {
             relic = 0;
 
         if (to > 0 && to < 5001 && to > cur) {
-            if (max == 0 || to <= max) {
+            if (max === 0 || to <= max) {
 
                 for (var j = cur; j < to; j++) {
                     relic += this.artifactUpg1(i, j);
@@ -196,8 +196,8 @@ var TT2 = {
 
         var AllDmgPetMtp = 1;
 
-        AllDmgPetMtp *= (activePet == 8 ? demos.active : demos.passive);
-        AllDmgPetMtp *= (activePet == 9 ? nova.active : nova.passive);
+        AllDmgPetMtp *= (activePet === 8 ? demos.active : demos.passive);
+        AllDmgPetMtp *= (activePet === 9 ? nova.active : nova.passive);
 
         //artifact
         var DivineRetribution = this.artifactEff(10, artLvArr[10]);
@@ -206,7 +206,7 @@ var TT2 = {
         var weapon = this.EquipWeapon[wpChosen],
             wpMtp = 1;
 
-        if (weapon.type == 'All Damage') {
+        if (weapon.type === 'All Damage') {
             wpMtp = this.getWeaponMtp(wpChosen, wpLv, artLvArr[16]);
         }
 
@@ -222,8 +222,8 @@ var TT2 = {
 
         var TapDmgPetMtp = 1;
 
-        TapDmgPetMtp *= (activePet == 10 ? hamy.active : hamy.passive);
-        TapDmgPetMtp *= (activePet == 11 ? phobos.active : phobos.passive);
+        TapDmgPetMtp *= (activePet === 10 ? hamy.active : hamy.passive);
+        TapDmgPetMtp *= (activePet === 11 ? phobos.active : phobos.passive);
 
         //artifact
         var DrunkenHammer = this.artifactEff(36, dkhmLv);
@@ -232,7 +232,7 @@ var TT2 = {
         var slash = this.EquipSlash[slashChosen],
             SlashMtp = 1;
 
-        if (slash.type == 'Tap Damage') {
+        if (slash.type === 'Tap Damage') {
             SlashMtp = this.getSlashMtp(slashChosen, slLv, amethLv);
         }
 
@@ -246,7 +246,7 @@ var TT2 = {
         var slash = this.EquipSlash[slashChosen],
             SlashMtp = 1;
 
-        if (slash.type == 'Pet Damage') {
+        if (slash.type === 'Pet Damage') {
             SlashMtp = this.getSlashMtp(slashChosen, slLv, amethLv);
         }
 
@@ -266,8 +266,8 @@ var TT2 = {
 
         var HeroDmgPetMtp = 1;
 
-        HeroDmgPetMtp *= (activePet == 6 ? tempest.active : tempest.passive);
-        HeroDmgPetMtp *= (activePet == 7 ? toto.active : toto.passive);
+        HeroDmgPetMtp *= (activePet === 6 ? tempest.active : tempest.passive);
+        HeroDmgPetMtp *= (activePet === 7 ? toto.active : toto.passive);
 
         //artifact
         var BladeOfDamocles = this.artifactEff(8, bodcLv);
@@ -276,7 +276,7 @@ var TT2 = {
         var weapon = this.EquipWeapon[wpChosen],
             wpMtp = 1;
 
-        if (weapon.type == 'All Hero Damage') {
+        if (weapon.type === 'All Hero Damage') {
             wpMtp = this.getWeaponMtp(wpChosen, wpLv, lwLv);
         }
 
@@ -286,7 +286,7 @@ var TT2 = {
         var hat = this.EquipHat[hatChosen],
             SpellHatMtp = 1;
 
-        if (hat.type == 'Spell Hero Damage') {
+        if (hat.type === 'Spell Hero Damage') {
             SpellHatMtp = this.getHatMtp(hatChosen, hatLv, hbLv);
         }
 
@@ -296,8 +296,8 @@ var TT2 = {
 
         var SpellPetMtp = 1;
 
-        SpellPetMtp *= (activePet == 0 ? zero.active : zero.passive);
-        SpellPetMtp *= (activePet == 1 ? harker.active : harker.passive);
+        SpellPetMtp *= (activePet === 0 ? zero.active : zero.passive);
+        SpellPetMtp *= (activePet === 1 ? harker.active : harker.passive);
 
         //artifact
         var CharmOfTheAncient = this.artifactEff(6, cotaLv);
@@ -314,7 +314,7 @@ var TT2 = {
         var hat = this.EquipHat[hatChosen],
             MeleeHatMtp = 1;
 
-        if (hat.type == 'Melee Hero Damage') {
+        if (hat.type === 'Melee Hero Damage') {
             MeleeHatMtp = this.getHatMtp(hatChosen, hatLv, hbLv);
         }
 
@@ -324,8 +324,8 @@ var TT2 = {
 
         var MeleePetMtp = 1;
 
-        MeleePetMtp *= (activePet == 2 ? cerberus.active : cerberus.passive);
-        MeleePetMtp *= (activePet == 3 ? basky.active : basky.passive);
+        MeleePetMtp *= (activePet === 2 ? cerberus.active : cerberus.passive);
+        MeleePetMtp *= (activePet === 3 ? basky.active : basky.passive);
 
         //artifact
         var FruitOfEden = this.artifactEff(5, foedLv);
@@ -342,7 +342,7 @@ var TT2 = {
         var hat = this.EquipHat[hatChosen],
             RangedHatMtp = 1;
 
-        if (hat.type == 'Ranged Hero Damage') {
+        if (hat.type === 'Ranged Hero Damage') {
             RangedHatMtp = this.getHatMtp(hatChosen, hatLv, hbLv);
         }
 
@@ -352,8 +352,8 @@ var TT2 = {
 
         var RangedPetMtp = 1;
 
-        RangedPetMtp *= (activePet == 4 ? scraps.active : scraps.passive);
-        RangedPetMtp *= (activePet == 5 ? mousy.active : mousy.passive);
+        RangedPetMtp *= (activePet === 4 ? scraps.active : scraps.passive);
+        RangedPetMtp *= (activePet === 5 ? mousy.active : mousy.passive);
 
         //artifact
         var SwordOfStorms = this.artifactEff(7, tsosLv);
@@ -370,7 +370,7 @@ var TT2 = {
         var aura = this.EquipAura[auraChosen],
             mtp = 0.002;
 
-        if (aura.type == 'Critical Chance') {
+        if (aura.type === 'Critical Chance') {
             mtp += this.getAuraMtp(auraChosen, auraLv);
         }
         if (csLv > 0) {
@@ -390,7 +390,7 @@ var TT2 = {
             weapon = this.EquipWeapon[wpChosen],
             wpMtp = 1;
 
-        if (weapon.type == 'Crit Damage') {
+        if (weapon.type === 'Crit Damage') {
             wpMtp = this.getWeaponMtp(wpChosen, wpLv, lwLv);
         }
         return {min: min * wpMtp, max: max * wpMtp};
@@ -399,7 +399,7 @@ var TT2 = {
         var suit = this.EquipSuit[suitChosen],
             SuitMtp = 1;
 
-        if (suit.type == 'All Gold') {
+        if (suit.type === 'All Gold') {
             SuitMtp = this.getSuitMtp(suitChosen, suitLv, homLv);
         }
 
@@ -409,8 +409,8 @@ var TT2 = {
 
         var PetMtp = 1;
 
-        PetMtp *= (activePet == 12 ? bubbles.active : bubbles.passive);
-        PetMtp *= (activePet == 13 ? polly.active : polly.passive);
+        PetMtp *= (activePet === 12 ? bubbles.active : bubbles.passive);
+        PetMtp *= (activePet === 13 ? polly.active : polly.passive);
 
         //artifact
         var BookOfProphecy = this.artifactEff(11, bopLv);
@@ -434,7 +434,7 @@ var TT2 = {
         var aura = this.EquipAura[auraChosen],
             mtp = 1;
 
-        if (aura.type == 'Titan HP') {
+        if (aura.type === 'Titan HP') {
             mtp = this.getAuraMtp(auraChosen, auraLv);
         }
         return mtp;
@@ -443,7 +443,7 @@ var TT2 = {
         var aura = this.EquipAura[auraChosen],
             mtp = 0.01;
 
-        if (aura.type == 'Chesterson Chance') {
+        if (aura.type === 'Chesterson Chance') {
             mtp += this.getAuraMtp(auraChosen, auraLv);
         }
 
@@ -454,7 +454,7 @@ var TT2 = {
         var suit = this.EquipSuit[suitChosen],
             suitMtp = 1;
 
-        if (suit.type == 'Chesterson Amount') {
+        if (suit.type === 'Chesterson Amount') {
             suitMtp = this.getSuitMtp(suitChosen, suitLv, homLv);
         }
 
@@ -488,12 +488,12 @@ var TT2 = {
         var mtp = 1,
             min = heroWpArr[0];
         for (var i = 0; i < heroWpArr.length; i++) {
-            if (i == heroIndex)
+            if (i === heroIndex)
                 mtp *= (1 + 0.5 * heroWpArr[i]);
             if (heroWpArr[i] < min)
                 min = heroWpArr[i];
         }
-        if (heroIndex == -1) {
+        if (heroIndex === -1) {
             return Math.max(min * 10, 1);
         }
         return mtp;
@@ -526,7 +526,7 @@ var TT2 = {
     // Cost form heroLv-1 to heroLv
     getHeroUpgCost: function (heroIndex, heroLv) {
         var init = this.Heros[heroIndex].init;
-        if (heroLv == 0)
+        if (heroLv === 0)
             return 0;
         return init * Math.pow(1.082, heroLv - 1);
     },
@@ -537,34 +537,34 @@ var TT2 = {
             skillCost = 0;
 
         if (heroLv >= 20) {
-            skillCost += this.getHeroUpgCost(heroIndex, 20) * 10
+            skillCost += this.getHeroUpgCost(heroIndex, 20) * 10;
         }
         if (heroLv >= 40) {
-            skillCost += this.getHeroUpgCost(heroIndex, 40) * 10
+            skillCost += this.getHeroUpgCost(heroIndex, 40) * 10;
         }
         if (heroLv >= 60) {
-            skillCost += this.getHeroUpgCost(heroIndex, 60) * 10
+            skillCost += this.getHeroUpgCost(heroIndex, 60) * 10;
         }
         if (heroLv >= 100) {
-            skillCost += this.getHeroUpgCost(heroIndex, 100) * 10
+            skillCost += this.getHeroUpgCost(heroIndex, 100) * 10;
         }
         if (heroLv >= 200) {
-            skillCost += this.getHeroUpgCost(heroIndex, 200) * 10
+            skillCost += this.getHeroUpgCost(heroIndex, 200) * 10;
         }
         if (heroLv >= 500) {
-            skillCost += this.getHeroUpgCost(heroIndex, 500) * 10
+            skillCost += this.getHeroUpgCost(heroIndex, 500) * 10;
         }
         if (heroLv >= 1000) {
-            skillCost += this.getHeroUpgCost(heroIndex, 1000) * 1010
+            skillCost += this.getHeroUpgCost(heroIndex, 1000) * 1010;
         }
         if (heroLv >= 2000) {
-            skillCost += this.getHeroUpgCost(heroIndex, 2000) * 1010
+            skillCost += this.getHeroUpgCost(heroIndex, 2000) * 1010;
         }
         if (heroLv >= 3000) {
-            skillCost += this.getHeroUpgCost(heroIndex, 3000) * 10
+            skillCost += this.getHeroUpgCost(heroIndex, 3000) * 10;
         }
         if (heroLv >= 4000) {
-            skillCost += this.getHeroUpgCost(heroIndex, 4000) * 10
+            skillCost += this.getHeroUpgCost(heroIndex, 4000) * 10;
         }
 
         return (basicCost + skillCost) * costMtp;
@@ -584,4 +584,4 @@ var TT2 = {
         }
         return Math.round(r * bosEff);
     }
-}
+};
