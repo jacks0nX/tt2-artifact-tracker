@@ -54,7 +54,7 @@ var initArtifactsTable = function () {
         '<th align="left">Icon</th>' +
         '<th align="left">Name</th>' +
         '<th align="left">Effect</th>' +
-        '<th align="center">Level</th>' +
+        '<th align="left">Level</th>' +
         '<th>Effect</th>' +
         (SHOW_COLUMN_DAMAGE ? '<th>Damage</th>' : '') +
         (SHOW_COLUMN_COST ? '<th>Cost</th>' : '') +
@@ -75,7 +75,7 @@ var initArtifactsTable = function () {
         iconString = '<td><img src="./img/a' + id + '.png" width="47" height="47"></td>';
         nameString = '<td align="left" class="small">' + artifact.name + '</td>';
         effect1String = '<td class="small">' + artifact.effect + '</td>';
-        levelString = '<td class="small" style="text-align:center;">' +
+        levelString = '<td class="small" style="text-align:left;">' +
             '<input class="art_cur_input" id="ai' + i + '" value="' + value + '" min="0" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number">' +
             '<span style="color:#d2b96a;"> / ' + (maxLevel ? maxLevel : '&infin;') + '</span>' +
             '</td>';
@@ -93,7 +93,7 @@ var initArtifactsTable = function () {
             '<span class="orange art" id="a' + i + '"></span> ' +
             '<img src="./img/relic.png" width="15" height="13" style="vertical-align:middle;">' +
             '</td>';
-        upgradeString = '<td class="small" align="left">' +
+        upgradeString = '<td class="small" align="center">' +
             '<input class="art_to_input" id="atoi' + i + '" value="' + valueTo + '" min="1" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number"> ' +
             '<span class="orange ato" id="ato' + i + '"></span> ' +
             '<img src="./img/relic.png" width="15" height="13" style="vertical-align: middle;">' +
@@ -220,12 +220,12 @@ var getFarmTimeString = function (time) {
 };
 
 var refresh = function () {
-    var farmStage = $('.farm_stage')[0].value,
-        artNum = 0,
+    var artNum = 0,
         currentInputField,
         currentInputLevel,
         efficiencyField,
         costToUpgrade,
+        levelToField,
         damageField,
         artifactMax,
         costField,
@@ -235,7 +235,8 @@ var refresh = function () {
     for (i = 0; i < TT2.Artifacts.length; i++) {
         artifact = TT2.Artifacts[i];
         currentInputField = $('.art_cur_input')[i];
-        currentInputLevel = currentInputField.value ? +currentInputField.value : 0;
+        currentInputLevel = currentInputField.value || 0;
+        levelToField = $('#atoi' + i);
         artifactMax = artifact.maxLvl;
         costField = $('#a' + i);
         efficiencyField = $('#aeff' + i);
@@ -248,18 +249,20 @@ var refresh = function () {
                 currentInputLevel = artifactMax;
                 currentInputField.value = currentInputLevel;
                 costField.html('<span class="small white">MAX</span>');
+                levelToField.prop('readonly', true);
             } else {
-                if (currentInputLevel == 0) {
+                levelToField.prop('readonly', false);
+
+                if (currentInputLevel === 0) {
                     costField.text('-');
                 } else {
                     costField.text(TT2.numFormat(costToUpgrade));
                 }
-
             }
+
             efficiencyField.text(new Number(parseFloat(TT2.artifactEff(i, currentInputLevel))).toFixed(2));
             damageField.text(TT2.numFormat(TT2.artifactDmg(i, currentInputLevel) * 100));
             upgToRefresh(i);
-
             ART_LEVEL[artifact.id] = currentInputLevel;
         } else {
             costField.text('-');
@@ -278,6 +281,7 @@ var refresh = function () {
 };
 
 var saveGlobalVariables = function () {
+    var farmStage = $('.farm_stage')[0].value;
     TT2.serialize(ART_LV_STORAGE_NAME, ART_LEVEL);
     TT2.serialize(ART_TO_LV_STORAGE_NAME, ART_TO_LEVEL);
     TT2.serialize(FARM_STAGE_STORAGE_NAME, farmStage);
