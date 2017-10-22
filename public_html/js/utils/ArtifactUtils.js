@@ -1,6 +1,8 @@
 /* global TT2, ARTIFACT_TO_LEVEL, RELICS_PER_SEC, ARTIFACT_LEVEL, RELICS_BEST_STAGE */
 ﻿var SHOW_COLUMN_DAMAGE = false,
-    SHOW_COLUMN_COST = false;
+    SHOW_COLUMN_COST = false,
+    SHOW_BUTTON_CLEAR_TO = true,
+    SHOW_BUTTON_ADD = true;
 
 var init = function () {
     initGlobalVariables();
@@ -77,6 +79,8 @@ var initArtifactsTable = function () {
             '<img src="./img/relic.png" width="15" height="13" style="vertical-align:middle;">' +
             '</td>';
         upgradeString = '<td class="small" align="center">' +
+            (SHOW_BUTTON_CLEAR_TO ? '<button type="button" class="clear_to_button" id="cb' + i + '">&#10005</button>' : '') +
+            (SHOW_BUTTON_ADD ? '<button type="button" class="add_to_button" id="ab' + i + '">	&#10010;</button>' : '') +
             '<input class="art_to_input" id="atoi' + i + '" value="' + valueTo + '" min="1" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number"> ' +
             '<span class="orange ato" id="ato' + i + '"></span> ' +
             '<img src="./img/relic.png" width="15" height="13" style="vertical-align: middle;">' +
@@ -118,6 +122,26 @@ var initEvents = function () {
     });
     $('.farm_time').bind('blur', function () {
         FARM_TIME = getFarmTimeSeconds();
+        refresh();
+    });
+    $('.clear_to_button').bind('click', function (event) {
+        var target = event.target,
+            targetId = target.id,
+            atoiId = targetId.substring(targetId.length - 1, targetId.length);
+        $('#atoi' + atoiId).val(0);
+        refresh();
+    });
+    $('.add_to_button').bind('click', function (event) {
+        var target = event.target,
+            targetId = target.id,
+            id = targetId.substring(targetId.length - 1, targetId.length),
+            toField = $('#atoi' + id),
+            levelField = $('#ai' + id),
+            currentLevel = +levelField.val(),
+            toLevel = +toField.val(),
+            value = toLevel < currentLevel ? currentLevel : toLevel;
+
+        toField.val(value + 100);
         refresh();
     });
 };
