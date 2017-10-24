@@ -58,7 +58,7 @@ var initTableContent = function () {
                 appendString += artifactCounter;
                 artifactCounter++;
             } else {
-                value = calculateNextArtifactCost(artifactCalcCounter);
+                value = calculateNextArtifactCost(artifactCalcCounter - 1);
                 value = TT2.numFormat(value);
                 appendString += value;
                 artifactCalcCounter++;
