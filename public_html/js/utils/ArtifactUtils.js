@@ -117,7 +117,7 @@ var initEvents = function () {
         refresh();
     });
     $('.farm_stage').bind('blur', function () {
-        relicsFarmStage = farmStageInputValue();
+        RELICS_FARM_STAGE = farmStageInputValue();
         refresh();
     });
     $('.farm_time').bind('blur', function () {
