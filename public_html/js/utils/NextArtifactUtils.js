@@ -1,10 +1,36 @@
 /* global TT2, FARM_TIME, RELICS_PER_SEC, RELICS_BEST_STAGE */
 var ARTIFACTS_AMOUNT = TT2.Artifacts.length,
     ARTIFACTS_PER_ROW = 4,
-    COLUMNS_PER_ROW = ARTIFACTS_PER_ROW * 2;
+    COLUMNS_PER_ROW = ARTIFACTS_PER_ROW * 2,
+    ARTIFACT_COST_INCREASE = 41;
 
 var calculateNextArtifactCost = function (currentArtifact) {
-    var nextArtifact = currentArtifact + 1;
+    var nextArtifact = currentArtifact + 1,
+        increasedCost = currentArtifact >= ARTIFACT_COST_INCREASE;
+
+    if (increasedCost) {
+        switch (nextArtifact) {
+            case 41:
+                return 2630000;
+            case 42:
+                return 4270000;
+            case 43:
+                return 6540000;
+            case 44:
+                return 10080000;
+            case 45:
+                return 15610000;
+            case 46:
+                return 24290000;
+            case 47:
+                return 37980000;
+            case 48:
+                return 59710000;
+            case 49:
+                return 94320000;
+        }
+    }
+
     return nextArtifact * Math.pow(1.31, nextArtifact);
 };
 
