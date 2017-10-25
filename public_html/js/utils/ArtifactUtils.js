@@ -39,8 +39,8 @@ var initArtifactsTable = function () {
         '<th align="left">Icon</th>' +
         '<th align="left">Name</th>' +
         '<th align="left">Effect</th>' +
-        '<th align="left">Level</th>' +
         '<th>Effect</th>' +
+        '<th align="center">Level</th>' +
         (SHOW_COLUMN_DAMAGE ? '<th>Damage</th>' : '') +
         (SHOW_COLUMN_COST ? '<th>Cost</th>' : '') +
         '<th>Upgrade</th>' +
@@ -55,12 +55,12 @@ var initArtifactsTable = function () {
         valueTo = ARTIFACT_TO_LEVEL[id];
         tier = artifact.tier;
 
-        numberString = '<td align="right">' + (i + 1) + '</td>';
+        numberString = '<td align="center">' + (i + 1) + '</td>';
         tierString = '<td align="middle" class="color' + tier + '"><b>' + tier + '</b></td>';
-        iconString = '<td><img src="./img/a' + id + '.png" width="47" height="47"></td>';
+        iconString = '<td><img src="./img/artifacts/a' + id + '.png" width="47" height="47"></td>';
         nameString = '<td align="left" class="small">' + artifact.name + '</td>';
         effect1String = '<td class="small">' + artifact.effect + '</td>';
-        levelString = '<td class="small" style="text-align:left;">' +
+        levelString = '<td class="small" style="text-align:center;">' +
             '<input class="art_cur_input" id="ai' + i + '" value="' + value + '" min="0" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number">' +
             '<span style="color:#d2b96a;"> / ' + (maxLevel ? maxLevel : '&infin;') + '</span>' +
             '</td>';
@@ -97,8 +97,8 @@ var initArtifactsTable = function () {
         artifactTable += iconString;
         artifactTable += nameString;
         artifactTable += effect1String;
-        artifactTable += levelString;
         artifactTable += effect2String;
+        artifactTable += levelString;
         artifactTable += SHOW_COLUMN_DAMAGE ? damageString : '';
         artifactTable += SHOW_COLUMN_COST ? costString : '';
         artifactTable += upgradeString;
@@ -144,19 +144,6 @@ var initEvents = function () {
         toField.val(value + 100);
         refresh();
     });
-};
-
-var initEmptyLevels = function () {
-    var emptyObject = {},
-        artifact,
-        i;
-
-    for (i = 0; i < TT2.Artifacts.length; i++) {
-        artifact = TT2.Artifacts[i];
-        emptyObject[artifact.id] = 0;
-    }
-
-    return emptyObject;
 };
 
 var refresh = function () {
