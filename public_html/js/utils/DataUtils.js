@@ -146,8 +146,17 @@ var TT2 = {
         }
         return -1;
     },
-    artifactEff: function (i, lv) {
-        return this.Artifacts[i].offset + lv * this.Artifacts[i].addupPerLvl;
+    artifactEff: function (i, level) {
+        var artifact = this.Artifacts[i],
+            offset = artifact.offset,
+            addupPerLvl = artifact.addupPerLvl,
+            costExp = artifact.costExp,
+            growthRate = artifact.growthRate,
+            growthMax = artifact.growthMax,
+            growth = Math.min(growthRate * level, growthMax),
+            exp = Math.pow(1 + (costExp - 1) * growth, 1);
+
+        return offset + addupPerLvl * Math.pow(level, exp);
     },
     artifactDmg: function (i, lv) {
         return lv * this.Artifacts[i].damPerLvl;
