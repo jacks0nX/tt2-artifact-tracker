@@ -8,8 +8,10 @@ var RELIC_PER_SEC_STORAGE_NAME = 'tt2_relic_per_sec',
     FARM_STAGE_STORAGE_NAME = 'tt2_farm_stage',
     ART_LV_STORAGE_NAME = 'tt2_art_lv_arr',
     ART_TO_LV_STORAGE_NAME = 'tt2_art_to_lv_arr',
+    SKILL_LEVEL_STORAGE_NAME = 'tt2_skill_lv_arr',
     ARTIFACT_TO_LEVEL = {},
     ARTIFACT_LEVEL = {},
+    SKILL_LEVEL = {},
     RELICS_PER_SEC = 0,
     RELICS_FARM_STAGE = 0,
     RELICS_BEST_STAGE = 0,
@@ -26,10 +28,12 @@ var initGlobalVariables = function () {
         stage = TT2.deserialize(FARM_STAGE_STORAGE_NAME),
         time = TT2.deserialize(FARM_TIME_STORAGE_NAME),
         levelTo = TT2.deserialize(ART_TO_LV_STORAGE_NAME),
-        level = TT2.deserialize(ART_LV_STORAGE_NAME);
+        level = TT2.deserialize(ART_LV_STORAGE_NAME),
+        skills = TT2.deserialize(SKILL_LEVEL_STORAGE_NAME);
 
-    ARTIFACT_LEVEL = level || initEmptyLevels();
-    ARTIFACT_TO_LEVEL = levelTo || initEmptyLevels();
+    ARTIFACT_LEVEL = level || initEmptyArtifacts();
+    ARTIFACT_TO_LEVEL = levelTo || initEmptyArtifacts();
+    SKILL_LEVEL = skills || initEmptySkills();
 
     if (perSec) {
         RELICS_PER_SEC = perSec;
@@ -48,13 +52,61 @@ var initGlobalVariables = function () {
         farmTimeInputValue(getFarmTimeString(time));
     }
 };
-var saveGlobalVariables = function () {
+var saveGlobalArtifactVariables = function () {
     var farmStage = farmStageInputValue();
     TT2.serialize(ART_LV_STORAGE_NAME, ARTIFACT_LEVEL);
     TT2.serialize(ART_TO_LV_STORAGE_NAME, ARTIFACT_TO_LEVEL);
     TT2.serialize(FARM_STAGE_STORAGE_NAME, farmStage);
     TT2.serialize(FARM_TIME_STORAGE_NAME, getFarmTimeSeconds());
     TT2.serialize(RELIC_PER_SEC_STORAGE_NAME, calcRelicsPerSecond());
+};
+var saveGlobalSkillVariables = function () {
+    TT2.serialize(SKILL_LEVEL_STORAGE_NAME, SKILL_LEVEL);
+};
+
+var initEmptyArtifacts = function () {
+    var artifacts = TT2.Artifacts,
+        map = {},
+        artifact,
+        i;
+
+    for (i = 0; i < artifacts.length; i++) {
+        artifact = artifacts[i];
+        map[artifact.id] = 0;
+    }
+
+    return map;
+};
+
+var initEmptySkills = function () {
+    var skillTrees = TT2.Skills,
+        map = {},
+        skillTree,
+        columns,
+        column,
+        rows,
+        i,
+        y,
+        x;
+
+    for (i = 0; i < skillTrees.length; i++) {
+        skillTree = skillTrees[i];
+        rows = skillTree.rows;
+
+        for (y = 0; y < rows.length; y++) {
+            columns = rows[y];
+
+            for (x = 0; x < columns.length; x++) {
+                column = columns[x];
+
+                if (column) {
+                    map[column.id] = 0;
+                }
+            }
+        }
+    }
+
+    return map;
 };
 
 // INPUT FIELDS
@@ -105,13 +157,16 @@ var farmRelicsInputValue = function (value) {
 };
 
 // CALCULATION
+// TODO update
 var calcRelicsFromStage = function () {
     var exponentialTerm = relicCalcMult1 * Math.pow(relicCalcBase, Math.pow(RELICS_FARM_STAGE, relicCalcExpo)),
         firstOrderTerm = relicCalcMult2 * (parseInt(RELICS_FARM_STAGE) + parseInt(relicCalcOffset)),
         t = Math.max(Math.ceil(exponentialTerm + firstOrderTerm), 0),
-        bos = ARTIFACT_LEVEL[1],
-        e = .05 * parseInt(bos),
-        l = t + (a = Math.max(Math.ceil(t * e), 0));
+        bosLevel = ARTIFACT_LEVEL[1],
+        bosPerLevel = TT2.Artifacts[0].addupPerLvl,
+        e = bosPerLevel * parseInt(bosLevel),
+        a = a = Math.max(Math.ceil(t * e), 0),
+        l = t + a;
 
     RELICS_BEST_STAGE = l;
     farmRelicsInputValue(RELICS_BEST_STAGE);

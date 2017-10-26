@@ -1,0 +1,51 @@
+.skills {
+    border-spacing: 0;
+    border: 1px solid #888;
+    background: #efefef;
+    
+    margin-bottom: 30px;
+}
+
+.skills td {
+    text-align: center;
+    /*width: 33%;*/
+    outline: 1px solid black;
+    height: 68px;
+    width: 68px;
+    vertical-align: top;
+}
+
+.skills label {
+    font-size: 12pt !important;
+    vertical-align: top;
+    
+    line-height: 20px !important;
+    margin: 0 !important;
+    display: block;
+    color: #333;
+    font-family: fantasy;
+    height: 70%;
+}
+
+.skilltree {
+/*    background-color:rgb(108,95,86);
+    padding: 8px;
+    width: 300px;*/
+}
+
+.skill_btn.on .skill_lv {
+    visibility: visible;
+}
+.skill_lv {
+    /*visibility: hidden;*/
+    /*margin: -22px 0 0 0;*/
+    width: 100%;
+    text-align: right;
+    font-family: arial;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px #272727, -1px -1px 1px rgba(167, 167, 167, 0.69);
+    font-size: 16px;
+    background-color: grey;
+    height: 30%;
+}

@@ -180,7 +180,7 @@ canvas{
     color:#444;
 }
 #mainbody{
-    width:1200px;
+    width: 100%;
     margin: 0 auto 40px;
 }
 #mainbody label{
@@ -192,8 +192,10 @@ canvas{
     font-family: fantasy;
 }
 #artifacts, #arti_cost{
-    border-spacing:0;border-left:1px solid #888;border-top:1px solid #888;background:#efefef;
-    user-select: none;
+    border-spacing:0;
+    border-left:1px solid #888;
+    border-top:1px solid #888;
+    background:#efefef;
     width: 100%;
 }
 #artifacts tr, #arti_cost tr{
@@ -315,11 +317,6 @@ canvas{
     font-size: 13px;
 }
 
-.skill_c{
-    background-color:rgb(108,95,86);
-    padding:8px;
-    width:528px;
-}
 .skill_tree{
     position: relative;
     padding:10px 8px;
@@ -461,20 +458,6 @@ canvas{
 }
 .skill_btn.on img{
     visibility: visible;
-}
-.skill_btn.on .skill_lv{
-    visibility: visible;
-}
-.skill_lv{
-    visibility: hidden;
-    margin: -22px 0 0 0;
-    width:62px;
-    text-align: right;
-    font-family: arial;
-    color: white;
-    font-weight: bold;
-    text-shadow: 1px 1px 1px #272727, -1px -1px 1px rgba(167, 167, 167, 0.69);
-    font-size: 16px;
 }
 .skill_btn_frame{
     position: absolute;

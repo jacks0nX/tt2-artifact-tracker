@@ -204,7 +204,7 @@ var refresh = function () {
 
     refreshArtNum(artNum);
     calcRelicsFromStage();
-    saveGlobalVariables();
+    saveGlobalArtifactVariables();
 };
 
 var upgToRefresh = function (i) {

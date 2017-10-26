@@ -1,161 +1,172 @@
-var selected = 1,
-	lvList = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	
-	SKILL_LV_STORAGE_NAME = 'tt2_skill_lv_arr';
+/* global SKILL_LEVEL, TT2 */
 
-var refresh = function(){
-	refTree();
-	refIntro();
-	refreshCnt();
-	TT2.serialize(SKILL_LV_STORAGE_NAME, lvList);
+var TREE_COLUMNS = 3;
+
+var init = function () {
+    initGlobalVariables();
+    initSkillTrees();
+    initEvents();
 };
 
-var refTree = function(){
-	for(var i=0; i<lvList.length; i++){
-		var skillBtn = $('#skill_s'+(i+1)),
-			skillLv = $('.skill_lv', skillBtn);
-
-		if(i == selected-1){			
-			skillBtn.addClass('s_selected');
-		}
-		else{
-			skillBtn.removeClass('s_selected');
-		}
-
-		if(lvList[i] > 0){
-			skillBtn.addClass('on');
-			skillLv.text(lvList[i]);
-		}
-		else{
-			skillBtn.removeClass('on');
-		}
-	}
+var initSkillTrees = function () {
+    var skills = TT2.Skills,
+        treeString,
+        treeTable,
+        tree,
+        i;
+    for (i = 0; i < skills.length; i++) {
+        treeString = '';
+        tree = skills[i];
+        treeString += initTable(tree);
+        treeTable = document.getElementById('skilltree_' + tree.name);
+        if (treeTable) {
+            treeTable.innerHTML = treeString;
+        }
+    }
 };
 
-var refIntro = function(){
-	var logo = $('#skill_intro_logo'),
-		name = $('#skill_name'),
-		eff = $('#skill_value'),
-		intro = $('#skill_intro'),
-		cost = $('#skill_btn_cost'),
-		btnTxt = $('#skill_btn_lower'),
-		btn = $('#skill_upgrade_btn'),
-		downBtn = $('#skill_downgrade_btn'),
-		lv = lvList[selected-1],
-		sk = TT2.Skills[selected-1];
+var initTable = function (skillTree) {
+    var resultString = '',
+        rows = skillTree.rows,
+        skillLevel,
+        buttonId,
+        levelId,
+        row,
+        col,
+        x,
+        y;
+    resultString += '<tr>' +
+        '<th></th>' +
+        '<th>' + skillTree.name + '</th>' +
+        '<th></th>' +
+        '</tr>';
+    for (y = 0; y < rows.length; y++) {
+        row = rows[y];
+        resultString += '<tr>';
+        for (x = 0; x < row.length; x++) {
+            buttonId = '';
+            col = row[x];
+            resultString += '<td %ID% class="skill_button">';
+            if (col) {
+                buttonId = 'id="skid_' + col.id + '"';
+                levelId = 'id="sklid_' + col.id + '"';
+                skillLevel = SKILL_LEVEL[col.id];
+                resultString += '<label>' + col.name + '</label>';
+                resultString += '<div %LID% class="skill_lv' + (skillLevel > 0 ? ' on' : '') + '">';
+                resultString += skillLevel;
+                resultString += '</div>';
+            }
 
-	logo.attr('src','./img/s'+selected+'.png');
-	name.text(sk.name);	
-	intro.text(sk.intro);
+            resultString = resultString.replace('%ID%', buttonId);
+            resultString = resultString.replace('%LID%', levelId);
+            resultString += '</td>';
+        }
 
-	btn.removeClass('skill_locked');
-	btn.removeClass('skill_upg');
+        resultString += '</tr>';
+    }
 
-	if(sk.precon>0 && lvList[sk.precon-1]==0){
-		eff.text(sk.pre+'0'+sk.app);
-		cost.text(sk.costArr[lv]);
-		btnTxt.text("Locked");
-		btn.addClass('skill_locked');
-	}
-	else if(lv==0){
-		eff.text(sk.pre+'0'+sk.app);
-		cost.text(sk.costArr[lv]);
-		btnTxt.text("Unlock");
-	}
-	else if(lv==sk.max){
-		eff.text(sk.pre+sk.effArr[lv-1]+sk.app);
-		cost.text('');
-		btnTxt.html("<span class=\"orange\">Maxed<span>");
-		btn.addClass('skill_upg');
-	}
-	else{
-		eff.text(sk.pre+sk.effArr[lv-1]+sk.app);
-		cost.text(sk.costArr[lv]);
-		btnTxt.text("Upgrade");
-		btn.addClass('skill_upg');
-	}
-
-	//check downgrade btn visibility
-	downBtn.show();
-	if(lv==0){
-		downBtn.hide();
-	}
-	else if(lv==1){
-		for(var i=0; i<TT2.Skills.length; i++){
-			if(TT2.Skills[i].precon == selected){
-				if(lvList[i]>0){
-					downBtn.hide();
-				}
-			}
-		}
-	}
+    resultString += '</tr>';
+    return resultString;
 };
 
-var refreshCnt = function(){
-	var cntDom = $('#skill_used'),
-		cnt = 0;
+var initEvents = function () {
+    $('.skill_button').contextmenu(function () {
+        return false;
+    });
+    $('.skill_button').mouseup(function (event) {
+        var button = event.button,
+            levelUp = button === 0,
+            levelDown = button === 2,
+            id = event.currentTarget.id,
+            shift = event.shiftKey,
+            requiredMatches,
+            requiredSkill,
+            canLevelDown,
+            requiredSum,
+            levelField,
+            canLevelUp,
+            addValue,
+            skill,
+            value;
 
-	for(var i=0; i<lvList.length; i++){
-		var lv = lvList[i];
-		if(lv>0){
-			var sk = TT2.Skills[i];
-			for(var j=0; j<lv; j++){
-				cnt += sk.costArr[j];
-			}
-		}
-	}
-	cntDom.text(cnt);
+        id = id ? id.split('_')[1] : null;
+
+        if (!id || (!levelUp && !levelDown)) {
+            return;
+        }
+
+        skill = getSkillById(id);
+        requiredSkill = getSkillById(skill.reqId);
+        levelField = $('#sklid_' + id);
+        value = +levelField.text();
+
+        if (levelUp) {
+            value += shift ? 5 : 1;
+            value = value > skill.maxLvl ? skill.maxLvl : value;
+        } else {
+            value += shift ? -5 : -1;
+            value = value < 0 ? 0 : value;
+        }
+
+        requiredMatches = !requiredSkill || SKILL_LEVEL[requiredSkill.id] > 0;
+
+        if (!requiredMatches) {
+            return;
+        }
+
+        levelField.text(value);
+        SKILL_LEVEL[id] = value;
+        saveGlobalSkillVariables();
+    });
 };
 
-var init = function(){
+var getSkillById = function (id) {
+    var skillTrees = TT2.Skills,
+        skillTree,
+        columns,
+        column,
+        rows,
+        i,
+        y,
+        x;
 
-	$('.skill_btn').bind('click', function(o){
-		var t = $(o.currentTarget),
-			num = t.attr('id').slice(7);
+    for (i = 0; i < skillTrees.length; i++) {
+        skillTree = skillTrees[i];
+        rows = skillTree.rows;
+        for (y = 0; y < rows.length; y++) {
+            columns = rows[y];
+            for (x = 0; x < columns.length; x++) {
+                column = columns[x];
+                if (column && column.id === +id) {
+                    return column;
+                }
+            }
+        }
+    }
 
-		selected = num;
-		refresh();
-	})
+    return null;
+};
 
-	$('#skill_upgrade_btn').bind('click', function(o){
+var getSkillTreeSum = function (skillTree) {
+    var rows = skillTree.rows,
+        resultCost = 0,
+        columns,
+        column,
+        y,
+        x;
 
-		var skill = TT2.Skills[selected-1],
-			pre = skill.precon;
+    for (y = 0; y < rows.length; y++) {
+        columns = rows[y];
+        for (x = 0; x < columns.length; x++) {
+            column = columns[x];
+            if (column) {
+                // TODO real cost
+                resultCost += SKILL_LEVEL[column.id];
+            }
+        }
+    }
 
-		if(lvList[selected-1]<skill.max){
-			if(skill.precon==0 || lvList[pre-1]>0){
-				lvList[selected-1]+=1;
-				refresh();
-			}
-		}
-	})
+    return resultCost;
+};
 
-	$('#skill_downgrade_btn').bind('click', function(o){
-
-		var skill = TT2.Skills[selected-1],
-			pre = skill.precon;
-
-		if(lvList[selected-1]>0){
-			lvList[selected-1] -= 1;
-			if(lvList[selected-1] == 0){
-				selected = pre ? pre : selected;
-			}
-			refresh();
-		}
-	})
-
-	$('#reset_btn').bind('click', function(o){
-		selected = 1;
-		for(var i=0;i<lvList.length;i++){
-			lvList[i] = 0;
-		}
-		refresh();
-	})
-
-	if(TT2.deserialize(SKILL_LV_STORAGE_NAME)){
-		lvList = TT2.deserialize(SKILL_LV_STORAGE_NAME);
-	}
-
-	refresh();
-}
-init()
+init();
