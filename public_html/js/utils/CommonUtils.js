@@ -9,13 +9,15 @@ var RELIC_PER_SEC_STORAGE_NAME = 'tt2_relic_per_sec',
     ART_LV_STORAGE_NAME = 'tt2_art_lv_arr',
     ART_TO_LV_STORAGE_NAME = 'tt2_art_to_lv_arr',
     SKILL_LEVEL_STORAGE_NAME = 'tt2_skill_lv_arr',
+    CURRENT_RELICS_STORAGE_NAME = 'tt2_current_relics',
     ARTIFACT_TO_LEVEL = {},
     ARTIFACT_LEVEL = {},
     SKILL_LEVEL = {},
-    RELICS_PER_SEC = 0,
     RELICS_FARM_STAGE = 0,
     RELICS_BEST_STAGE = 0,
-    FARM_TIME = 0;
+    RELICS_PER_SEC = 0,
+    CURRENT_RELICS = 0,
+    FARM_TIME = 0,
     relicCalcOffset = -110,
     relicCalcMult2 = 1.5,
     relicCalcBase = 1.21,
@@ -29,7 +31,8 @@ var initGlobalVariables = function () {
         time = TT2.deserialize(FARM_TIME_STORAGE_NAME),
         levelTo = TT2.deserialize(ART_TO_LV_STORAGE_NAME),
         level = TT2.deserialize(ART_LV_STORAGE_NAME),
-        skills = TT2.deserialize(SKILL_LEVEL_STORAGE_NAME);
+        skills = TT2.deserialize(SKILL_LEVEL_STORAGE_NAME),
+        relics = TT2.deserialize(CURRENT_RELICS_STORAGE_NAME);
 
     ARTIFACT_LEVEL = level || initEmptyArtifacts();
     ARTIFACT_TO_LEVEL = levelTo || initEmptyArtifacts();
@@ -51,14 +54,19 @@ var initGlobalVariables = function () {
         FARM_TIME = time;
         farmTimeInputValue(getFarmTimeString(time));
     }
+
+    if (relics) {
+        CURRENT_RELICS = relics;
+        currentRelicsInputValue(relics);
+    }
 };
 var saveGlobalArtifactVariables = function () {
-    var farmStage = farmStageInputValue();
     TT2.serialize(ART_LV_STORAGE_NAME, ARTIFACT_LEVEL);
     TT2.serialize(ART_TO_LV_STORAGE_NAME, ARTIFACT_TO_LEVEL);
-    TT2.serialize(FARM_STAGE_STORAGE_NAME, farmStage);
+    TT2.serialize(FARM_STAGE_STORAGE_NAME, farmStageInputValue());
     TT2.serialize(FARM_TIME_STORAGE_NAME, getFarmTimeSeconds());
     TT2.serialize(RELIC_PER_SEC_STORAGE_NAME, calcRelicsPerSecond());
+    TT2.serialize(CURRENT_RELICS_STORAGE_NAME, getCurrentRelicsNumber());
 };
 var saveGlobalSkillVariables = function () {
     TT2.serialize(SKILL_LEVEL_STORAGE_NAME, SKILL_LEVEL);
@@ -77,7 +85,6 @@ var initEmptyArtifacts = function () {
 
     return map;
 };
-
 var initEmptySkills = function () {
     var skillTrees = TT2.Skills,
         map = {},
@@ -110,50 +117,36 @@ var initEmptySkills = function () {
 };
 
 // INPUT FIELDS
-var farmStageInputValue = function (value) {
-    var field = $('.farm_stage');
+var inputValue = function (fieldName, value) {
+    var field = $('.' + fieldName);
 
     if (value === null || value === undefined) {
         return field.val();
     }
 
     field.val(value);
+};
+var farmStageInputValue = function (value) {
+    return inputValue('farm_stage', value);
 };
 var farmTimeInputValue = function (value) {
-    var field = $('.farm_time');
-
-    if (value === null || value === undefined) {
-        return field.val();
-    }
-
-    field.val(value);
+    return inputValue('farm_time', value);
 };
 var farmPerSecInputValue = function (value) {
-    var field = $('.farm_per_second');
-
-    if (value === null || value === undefined) {
-        return field.val();
-    }
-
-    field.val(value);
+    return inputValue('farm_per_second', value);
 };
 var farmPerHourInputValue = function (value) {
-    var field = $('.farm_per_hour');
-
-    if (value === null || value === undefined) {
-        return field.val();
-    }
-
-    field.val(value);
+    return inputValue('farm_per_hour', value);
 };
 var farmRelicsInputValue = function (value) {
-    var field = $('.farm_relics');
-
-    if (value === null || value === undefined) {
-        return field.val();
+    return inputValue('farm_relics', value);
+};
+var currentRelicsInputValue = function (value) {
+    if (value) {
+        value = TT2.numFormat(value);
     }
 
-    field.val(value);
+    return inputValue('current_relics', value);
 };
 
 // CALCULATION
@@ -194,4 +187,8 @@ var getFarmTimeString = function (time) {
     text = ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2);
     farmTimeInputValue(text);
     return text;
+};
+var getCurrentRelicsNumber = function () {
+    var relicsText = currentRelicsInputValue();
+    return TT2.textToNumFormat(relicsText);
 };

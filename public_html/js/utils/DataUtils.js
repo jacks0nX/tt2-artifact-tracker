@@ -122,6 +122,23 @@ var TT2 = {
             return Math.round(myNum);
         }
     },
+    textToNumFormat: function (text) {
+        var textSplit = text.split(' '),
+            result = new Number(textSplit[0]),
+            unit = textSplit[1];
+
+        if (unit === 'T') {
+            result *= 1e12;
+        } else if (unit === 'B') {
+            result *= 1e9;
+        } else if (unit === 'M') {
+            result *= 1e6;
+        } else if (unit === 'K') {
+            result *= 1000;
+        }
+
+        return result;
+    },
     artifactUpg1: function (i, cur) {
         return ((+this.Artifacts[i].costCoef) * Math.pow(+cur + 1, this.Artifacts[i].costExp));
     },

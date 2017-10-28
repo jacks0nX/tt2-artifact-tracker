@@ -2,7 +2,8 @@
 ﻿var SHOW_COLUMN_DAMAGE = false,
     SHOW_COLUMN_COST = false,
     SHOW_BUTTON_CLEAR_TO = true,
-    SHOW_BUTTON_ADD = true;
+    SHOW_BUTTON_ADD = true,
+    upgradeCostSum = 0;
 
 var init = function () {
     initGlobalVariables();
@@ -43,8 +44,8 @@ var initArtifactsTable = function () {
         '<th align="center">Level</th>' +
         (SHOW_COLUMN_DAMAGE ? '<th>Damage</th>' : '') +
         (SHOW_COLUMN_COST ? '<th>Cost</th>' : '') +
-        '<th>Upgrade</th>' +
-        '<th>Prestiges</th>' +
+        '<th id="upgradeHeader">Upgrade</th>' +
+        '<th id="prestigeHeader">Prestiges</th>' +
         '</tr>';
 
     for (i = 0; i < TT2.Artifacts.length; i++) {
@@ -110,28 +111,28 @@ var initArtifactsTable = function () {
 };
 
 var initEvents = function () {
-    $('.art_cur_input').bind('change', function () {
+    $('.art_cur_input').change(function () {
         refresh();
     });
-    $('.art_to_input').bind('change', function () {
+    $('.art_to_input').change(function () {
         refresh();
     });
-    $('.farm_stage').bind('blur', function () {
+    $('.farm_stage').blur(function () {
         RELICS_FARM_STAGE = farmStageInputValue();
         refresh();
     });
-    $('.farm_time').bind('blur', function () {
+    $('.farm_time').blur(function () {
         FARM_TIME = getFarmTimeSeconds();
         refresh();
     });
-    $('.clear_to_button').bind('click', function (event) {
+    $('.clear_to_button').click(function (event) {
         var target = event.target,
             targetId = target.id,
             atoiId = targetId.substring(2, targetId.length);
         $('#atoi' + atoiId).val(0);
         refresh();
     });
-    $('.add_to_button').bind('click', function (event) {
+    $('.add_to_button').click(function (event) {
         var target = event.target,
             targetId = target.id,
             id = targetId.substring(2, targetId.length),
@@ -142,6 +143,10 @@ var initEvents = function () {
             value = toLevel < currentLevel ? currentLevel : toLevel;
 
         toField.val(value + 100);
+        refresh();
+    });
+    $('.current_relics').blur(function () {
+        CURRENT_RELICS = getCurrentRelicsNumber();
         refresh();
     });
 };
@@ -158,6 +163,8 @@ var refresh = function () {
         costField,
         artifact,
         i;
+
+    upgradeCostSum = 0;
 
     for (i = 0; i < TT2.Artifacts.length; i++) {
         artifact = TT2.Artifacts[i];
@@ -202,6 +209,7 @@ var refresh = function () {
         }
     }
 
+    setUpgradeToSum();
     refreshArtNum(artNum);
     calcRelicsFromStage();
     saveGlobalArtifactVariables();
@@ -209,46 +217,83 @@ var refresh = function () {
 
 var upgToRefresh = function (i) {
     var artifact = TT2.Artifacts[i],
-        ipt1 = $('#ai' + i)[0],
-        ipt2 = $('#atoi' + i)[0],
-        currentLevel = ipt1.value ? +ipt1.value : 0,
-        levelTo = ipt2.value ? +ipt2.value : 0,
+        levelField = $('#ai' + i),
+        levelToField = $('#atoi' + i),
+        costToField = $('#ato' + i),
         max = artifact.maxLvl,
-        relicDom2 = $('#ato' + i),
-        upgradeCost = TT2.artifactUpgTo(i, currentLevel, levelTo);
+        currentLevel,
+        upgradeCost,
+        levelTo;
 
+    levelTo = levelToField.val() ? +levelToField.val() : 0;
     if (max && levelTo > max) {
-        ipt2.value = max;
+        levelToField.val(max);
         levelTo = max;
     }
 
     ARTIFACT_TO_LEVEL[artifact.id] = levelTo;
+    currentLevel = levelField.val() ? +levelField.val() : 0;
+    upgradeCost = TT2.artifactUpgTo(i, currentLevel, levelTo);
 
-    if (upgradeCost > 0) {
-        relicDom2.text(TT2.numFormat(upgradeCost));
-        if (RELICS_PER_SEC > 0) {
-            var t = 0,
-                num = 0;
-
-            if (RELICS_BEST_STAGE > 0) {
-                num = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
-                t = num * FARM_TIME / 3600;
-            }
-
-            $('#atce' + i).text(t.toFixed(2));
-            $('#atte' + i).text(TT2.numFormat(num));
-        }
-
-        if (RELICS_BEST_STAGE > 0) {
-            var num = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
-            $('#atte' + i).text(TT2.numFormat(num));
-        }
-
-    } else {
-        relicDom2.text('');
+    if (upgradeCost <= 0) {
+        costToField.text('');
         $('#atce' + i).text('');
         $('#atte' + i).text('');
+        return;
     }
+
+    costToField.text(TT2.numFormat(upgradeCost));
+    if (RELICS_PER_SEC > 0) {
+        setEstimateTime(i, upgradeCost);
+    }
+
+    if (RELICS_BEST_STAGE > 0) {
+        setEstimatePrestiges(i, upgradeCost);
+    }
+
+    upgradeCostSum += upgradeCost;
+};
+
+var setEstimateTime = function (id, upgradeCost) {
+    var prestigeTime = 0,
+        numberOfPrestiges = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
+
+    if (RELICS_BEST_STAGE > 0) {
+        prestigeTime = numberOfPrestiges * FARM_TIME / 3600;
+    }
+
+    $('#atce' + id).text(prestigeTime.toFixed(2));
+};
+
+var setEstimatePrestiges = function (id, upgradeCost) {
+    var numberOfPrestiges = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
+    $('#atte' + id).text(TT2.numFormat(numberOfPrestiges));
+};
+
+var setUpgradeToSum = function () {
+    var upgradeHeaderField = $('#upgradeHeader'),
+        prestigeHeaderField = $('#prestigeHeader'),
+        prestigesText = 'Prestiges',
+        upgradeText = 'Upgrades',
+        numberPrestiges,
+        timePrestiges,
+        upgradeCost;
+
+    if (!upgradeCostSum) {
+        upgradeHeaderField.text(upgradeText);
+        prestigeHeaderField.text(prestigesText);
+        return;
+    }
+
+    upgradeCost = upgradeCostSum - CURRENT_RELICS;
+    numberPrestiges = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
+    timePrestiges = numberPrestiges * FARM_TIME / 3600;
+
+    upgradeText += ' (' + TT2.numFormat(upgradeCost) + ')';
+    prestigesText += ' (' + timePrestiges.toFixed(2) + 'h, ' + numberPrestiges + ')' ;
+
+    upgradeHeaderField.text(upgradeText);
+    prestigeHeaderField.text(prestigesText);
 };
 
 init();
