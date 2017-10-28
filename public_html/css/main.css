@@ -697,7 +697,7 @@ canvas{
 .dmg_pet_c .dmg_hat_left, .dmg_art_c .dmg_hat_left, .dmg_equip_c .dmg_hat_left{
     margin-right: 10px;
 }
-.dmg_pet_c input, .dmg_art_c input, .dmg_equip_c input, #artifacts input, .dmg_clan_dom input, .clear_to_button, .add_to_button{
+.dmg_pet_c input, .dmg_art_c input, .dmg_equip_c input, #artifacts input, .dmg_clan_dom input, .clear_to_button, .add_to_button, .reduce_to_button{
     width: 40px;
     padding: 2px 0 1px 5px;
     -webkit-appearance: none;
@@ -708,11 +708,12 @@ canvas{
     box-shadow: inset 1px 1px 1px #464646; 
     vertical-align: middle;
 }
-.clear_to_button, .add_to_button {
+.clear_to_button, .add_to_button, .reduce_to_button {
     width: 18px;
     height: 18px;
     margin-right: 4px;
-    text-align: left;
+    text-align: center;
+    padding: 0px !important;
 }
 .dmg_c::after, .dmg_pet_c::after, .equip_block::after{
     display: table;

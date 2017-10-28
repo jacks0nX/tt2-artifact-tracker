@@ -2,6 +2,7 @@
 ﻿var SHOW_COLUMN_DAMAGE = false,
     SHOW_COLUMN_COST = false,
     SHOW_BUTTON_CLEAR_TO = true,
+    SHOW_BUTTON_REDUCE = true,
     SHOW_BUTTON_ADD = true,
     HIDE_MAXIMIZED = true,
     upgradeCostSum = 0;
@@ -22,12 +23,15 @@ var initArtifactsTable = function () {
         upgradeString,
         numberString,
         damageString,
+        reduceButton,
+        clearButton,
         levelString,
         tierString,
         iconString,
         costString,
         nameString,
         isMaxLevel,
+        addButton,
         artifact,
         maxLevel,
         valueTo,
@@ -88,19 +92,21 @@ var initArtifactsTable = function () {
 
         upgradeString = '<td class="small" align="center">';
         if (!isMaxLevel) {
-            upgradeString += (SHOW_BUTTON_CLEAR_TO ? '<button type="button" class="clear_to_button" id="cb' + i + '">&#10005</button>' : '') +
-            (SHOW_BUTTON_ADD ? '<button type="button" class="add_to_button" id="ab' + i + '">	&#10010;</button>' : '') +
-            '<input class="art_to_input" id="atoi' + i + '" value="' + valueTo + '" min="1" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number"> ' +
-            '<span class="orange ato" id="ato' + i + '"></span> ' +
-            '<img src="./img/relic.png" width="15" height="13" style="vertical-align: middle;">';
+            clearButton = SHOW_BUTTON_CLEAR_TO ? '<button type="button" class="clear_to_button" id="cb' + i + '">x</button>' : '';
+            addButton = SHOW_BUTTON_ADD ? '<button type="button" class="add_to_button" id="ab' + i + '">+</button>' : '';
+            reduceButton = SHOW_BUTTON_REDUCE ? '<button type="button" class="reduce_to_button" id="rb' + i + '">&#45;</button>' : '';
+            upgradeString += clearButton + reduceButton + addButton +
+                '<input class="art_to_input" id="atoi' + i + '" value="' + valueTo + '" min="1" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number"> ' +
+                '<span class="orange ato" id="ato' + i + '"></span> ' +
+                '<img src="./img/relic.png" width="15" height="13" style="vertical-align: middle;">';
         }
         upgradeString += '</td>';
 
         estimateString = '<td align="right" style="text-align:center;">';
         if (!isMaxLevel) {
             estimateString += '<span class="orange atce" id="atce' + i + '"></span> ' +
-            '<span class="colorC small"> h</span>' +
-            '<span></span><span class="orange atte" id="atte' + i + '"></span><span class="small"> prst</span><span></span>';
+                '<span class="colorC small"> h</span>' +
+                '<span></span><span class="orange atte" id="atte' + i + '"></span><span class="small"> prst</span><span></span>';
         }
         estimateString += '</td>';
 
@@ -157,9 +163,29 @@ var initEvents = function () {
         toField.val(value + 100);
         refresh();
     });
+    $('.reduce_to_button').click(function (event) {
+        var target = event.target,
+            targetId = target.id,
+            id = targetId.substring(2, targetId.length),
+            toField = $('#atoi' + id),
+            levelField = $('#ai' + id),
+            currentLevel = +levelField.val(),
+            toLevel = +toField.val(),
+            value = toLevel < currentLevel ? currentLevel : toLevel;
+
+        value -= 100;
+        toField.val(value < currentLevel ? 0 : value);
+        refresh();
+    });
     $('.current_relics').blur(function () {
         CURRENT_RELICS = getCurrentRelicsNumber();
         refresh();
+    });
+    $('#exportLevel').click(function () {
+        alert(JSON.stringify(ARTIFACT_LEVEL));
+    });
+    $('#exportLevelTo').click(function () {
+        alert(JSON.stringify(ARTIFACT_TO_LEVEL));
     });
 };
 
@@ -302,7 +328,7 @@ var setUpgradeToSum = function () {
     if (upgradeCost > 0) {
         numberPrestiges = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
         timePrestiges = numberPrestiges * FARM_TIME / 3600;
-        prestigesText += ' (' + timePrestiges.toFixed(2) + 'h, ' + numberPrestiges + ')' ;
+        prestigesText += ' (' + timePrestiges.toFixed(2) + 'h, ' + numberPrestiges + ')';
     } else {
         upgradeCost = upgradeCostSum;
     }
