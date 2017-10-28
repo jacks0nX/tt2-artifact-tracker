@@ -26,6 +26,7 @@ var initArtifactsTable = function () {
         iconString,
         costString,
         nameString,
+        isMaxLevel,
         artifact,
         maxLevel,
         valueTo,
@@ -55,6 +56,7 @@ var initArtifactsTable = function () {
         value = ARTIFACT_LEVEL[id];
         valueTo = ARTIFACT_TO_LEVEL[id];
         tier = artifact.tier;
+        isMaxLevel = maxLevel && value >= maxLevel;;
 
         numberString = '<td align="center">' + (i + 1) + '</td>';
         tierString = '<td align="middle" class="color' + tier + '"><b>' + tier + '</b></td>';
@@ -65,32 +67,41 @@ var initArtifactsTable = function () {
             '<input class="art_cur_input" id="ai' + i + '" value="' + value + '" min="0" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number">' +
             '<span style="color:#d2b96a;"> / ' + (maxLevel ? maxLevel : '&infin;') + '</span>' +
             '</td>';
+
         effect2String = '<td align="left" class="small td_a">' +
             '<span class="a_mark">' + artifact.pref + '</span> ' +
             '<span class="aeff orange" id="aeff' + i + '"></span> ' +
             '<span class="colorC"> ' + artifact.app + '</span>' +
             '</td>';
+
         damageString = '<td align="middle" class="td_a">' +
             '<span class="a_mark">+</span> ' +
             '<span class="orange adam" id="adam' + i + '"></span>' +
             '<span class="colorC small"> %</span>' +
             '</td>';
+
         costString = '<td align="right" class="small td_a">' + //Next Cost
             '<span class="orange art" id="a' + i + '"></span> ' +
             '<img src="./img/relic.png" width="15" height="13" style="vertical-align:middle;">' +
             '</td>';
-        upgradeString = '<td class="small" align="center">' +
-            (SHOW_BUTTON_CLEAR_TO ? '<button type="button" class="clear_to_button" id="cb' + i + '">&#10005</button>' : '') +
+
+        upgradeString = '<td class="small" align="center">';
+        if (!isMaxLevel) {
+            upgradeString += (SHOW_BUTTON_CLEAR_TO ? '<button type="button" class="clear_to_button" id="cb' + i + '">&#10005</button>' : '') +
             (SHOW_BUTTON_ADD ? '<button type="button" class="add_to_button" id="ab' + i + '">	&#10010;</button>' : '') +
             '<input class="art_to_input" id="atoi' + i + '" value="' + valueTo + '" min="1" max="' + (maxLevel || '') + '" step="1" style="width:50px" type="number"> ' +
             '<span class="orange ato" id="ato' + i + '"></span> ' +
-            '<img src="./img/relic.png" width="15" height="13" style="vertical-align: middle;">' +
-            '</td>';
-        estimateString = '<td align="right" style="text-align:center;">' +
-            '<span class="orange atce" id="atce' + i + '"></span> ' +
+            '<img src="./img/relic.png" width="15" height="13" style="vertical-align: middle;">';
+        }
+        upgradeString += '</td>';
+
+        estimateString = '<td align="right" style="text-align:center;">';
+        if (!isMaxLevel) {
+            estimateString += '<span class="orange atce" id="atce' + i + '"></span> ' +
             '<span class="colorC small"> h</span>' +
-            '<span></span><span class="orange atte" id="atte' + i + '"></span><span class="small"> prst</span><span></span>' +
-            '</td>';
+            '<span></span><span class="orange atte" id="atte' + i + '"></span><span class="small"> prst</span><span></span>';
+        }
+        estimateString += '</td>';
 
         artifactTable += '<tr class="tr_color' + tier + '">';
         artifactTable += numberString;
