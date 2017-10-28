@@ -3,6 +3,7 @@
     SHOW_COLUMN_COST = false,
     SHOW_BUTTON_CLEAR_TO = true,
     SHOW_BUTTON_ADD = true,
+    HIDE_MAXIMIZED = true,
     upgradeCostSum = 0;
 
 var init = function () {
@@ -56,7 +57,7 @@ var initArtifactsTable = function () {
         value = ARTIFACT_LEVEL[id];
         valueTo = ARTIFACT_TO_LEVEL[id];
         tier = artifact.tier;
-        isMaxLevel = maxLevel && value >= maxLevel;;
+        isMaxLevel = maxLevel && value >= maxLevel;
 
         numberString = '<td align="center">' + (i + 1) + '</td>';
         tierString = '<td align="middle" class="color' + tier + '"><b>' + tier + '</b></td>';
@@ -103,7 +104,7 @@ var initArtifactsTable = function () {
         }
         estimateString += '</td>';
 
-        artifactTable += '<tr class="tr_color' + tier + '">';
+        artifactTable += '<tr class="tr_color' + tier + '"' + (HIDE_MAXIMIZED && isMaxLevel ? ' style="display: none !important;"' : '') + '>';
         artifactTable += numberString;
         artifactTable += tierString;
         artifactTable += iconString;
@@ -297,12 +298,16 @@ var setUpgradeToSum = function () {
     }
 
     upgradeCost = upgradeCostSum - CURRENT_RELICS;
-    numberPrestiges = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
-    timePrestiges = numberPrestiges * FARM_TIME / 3600;
+
+    if (upgradeCost > 0) {
+        numberPrestiges = Math.ceil(upgradeCost / RELICS_BEST_STAGE);
+        timePrestiges = numberPrestiges * FARM_TIME / 3600;
+        prestigesText += ' (' + timePrestiges.toFixed(2) + 'h, ' + numberPrestiges + ')' ;
+    } else {
+        upgradeCost = upgradeCostSum;
+    }
 
     upgradeText += ' (' + TT2.numFormat(upgradeCost) + ')';
-    prestigesText += ' (' + timePrestiges.toFixed(2) + 'h, ' + numberPrestiges + ')' ;
-
     upgradeHeaderField.text(upgradeText);
     prestigeHeaderField.text(prestigesText);
 };
