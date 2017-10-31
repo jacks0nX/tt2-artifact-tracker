@@ -216,6 +216,10 @@ var initEvents = function () {
         buildFilter = buildFilter === 'SC' ? '' : 'SC';
         refresh();
     });
+    $('#build_hs').click(function () {
+        buildFilter = buildFilter === 'HS' ? '' : 'HS';
+        refresh();
+    });
     $('.tier_header').click(onTierHeaderClick);
 //    $('.tier_header').click(function () {
 //        var me = $(this),
