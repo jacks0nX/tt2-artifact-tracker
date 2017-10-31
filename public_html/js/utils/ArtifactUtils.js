@@ -1,11 +1,13 @@
-/* global TT2, ARTIFACT_TO_LEVEL, RELICS_PER_SEC, ARTIFACT_LEVEL, RELICS_BEST_STAGE */
+/* global TT2, ARTIFACT_TO_LEVEL, RELICS_PER_SEC, ARTIFACT_LEVEL, RELICS_BEST_STAGE, TIER_COLLAPSE */
 ﻿var SHOW_COLUMN_DAMAGE = false,
     SHOW_COLUMN_COST = false,
+    SHOW_COLUMN_BUILD = false,
     SHOW_BUTTON_CLEAR_TO = true,
     SHOW_BUTTON_REDUCE = true,
     SHOW_BUTTON_ADD = true,
     HIDE_MAXIMIZED = true,
-    upgradeCostSum = 0;
+    upgradeCostSum = 0,
+    buildFilter = '';
 
 var init = function () {
     initGlobalVariables();
@@ -16,6 +18,7 @@ var init = function () {
 
 var initArtifactsTable = function () {
     var artifactsDiv = document.getElementById("artifacts"),
+        previousTier,
         estimateString,
         effect1String,
         effect2String,
@@ -24,6 +27,7 @@ var initArtifactsTable = function () {
         numberString,
         damageString,
         reduceButton,
+        buildString,
         clearButton,
         levelString,
         tierString,
@@ -43,6 +47,7 @@ var initArtifactsTable = function () {
     artifactTable = '<tr>' +
         '<th>#</th>' +
         '<th>Tier</th>' +
+        (SHOW_COLUMN_BUILD ? '<th>Build</th>' : '') +
         '<th align="left">Icon</th>' +
         '<th align="left">Name</th>' +
         '<th align="left">Effect</th>' +
@@ -65,6 +70,9 @@ var initArtifactsTable = function () {
 
         numberString = '<td align="center">' + (i + 1) + '</td>';
         tierString = '<td align="middle" class="color' + tier + '"><b>' + tier + '</b></td>';
+
+        buildString = '<td align="middle" style="font-size: 10px">' + artifact.build + '</td>';
+
         iconString = '<td><img src="./img/artifacts/a' + id + '.png" width="47" height="47"></td>';
         nameString = '<td align="left" class="small">' + artifact.name + '</td>';
         effect1String = '<td class="small">' + artifact.effect + '</td>';
@@ -110,9 +118,18 @@ var initArtifactsTable = function () {
         }
         estimateString += '</td>';
 
-        artifactTable += '<tr class="tr_color' + tier + '"' + (HIDE_MAXIMIZED && isMaxLevel ? ' style="display: none !important;"' : '') + '>';
+        if (tier !== previousTier) {
+            artifactTable += '<tr id="tier' + tier + '" class="tier_header tr_color' + tier + '">';
+            artifactTable += '<td id="tier_collapse">-</td>';
+            artifactTable += '<td align="middle" class="color' + tier + '">' + artifact.tier + '</td>';
+            artifactTable += '<td colspan="7"></td>';
+            artifactTable += '</tr>';
+        }
+
+        artifactTable += '<tr id="artrow' + artifact.id + '" class="tr_color' + tier + '"' + '>';
         artifactTable += numberString;
         artifactTable += tierString;
+        artifactTable += SHOW_COLUMN_BUILD ? buildString : '';
         artifactTable += iconString;
         artifactTable += nameString;
         artifactTable += effect1String;
@@ -123,9 +140,13 @@ var initArtifactsTable = function () {
         artifactTable += upgradeString;
         artifactTable += estimateString;
         artifactTable += '</tr>';
+
+        previousTier = artifact.tier;
     }
 
     artifactsDiv.innerHTML = artifactTable;
+
+    refreshTierCollapse();
 };
 
 var initEvents = function () {
@@ -187,6 +208,64 @@ var initEvents = function () {
     $('#exportLevelTo').click(function () {
         alert(JSON.stringify(ARTIFACT_TO_LEVEL));
     });
+    $('#build_cs').click(function () {
+        buildFilter = buildFilter === 'CS' ? '' : 'CS';
+        refresh();
+    });
+    $('#build_sc').click(function () {
+        buildFilter = buildFilter === 'SC' ? '' : 'SC';
+        refresh();
+    });
+    $('.tier_header').click(onTierHeaderClick);
+//    $('.tier_header').click(function () {
+//        var me = $(this),
+//        id = me.prop('id'), // TODO
+//        tierHeader = me.find('#tier_collapse'),
+//        tierRows = me.nextUntil('.tier_header'),
+//        shouldHide,
+//        row;
+//
+//        tierHeader.text(function (a, value) {
+//            shouldHide = value === '-';
+//            return shouldHide ? '+' : '-';
+//        });
+//
+//        TIER_COLLAPSE[id[4]] = shouldHide;
+//
+//        tierRows.each(function (index, domRow) {
+//            row = $(domRow);
+//            if (!row.prop('disabled')) {
+//                row.toggle();
+//            }
+//        });
+//
+//        refresh();
+//    });
+};
+
+var onTierHeaderClick = function () {
+    var me = $(this),
+        id = me.prop('id'), // TODO
+        tierHeader = me.find('#tier_collapse'),
+        tierRows = me.nextUntil('.tier_header'),
+        shouldHide,
+        row;
+
+        tierHeader.text(function (a, value) {
+            shouldHide = value === '-';
+            return shouldHide ? '+' : '-';
+        });
+
+        TIER_COLLAPSE[id[4]] = shouldHide;
+
+        tierRows.each(function (index, domRow) {
+            row = $(domRow);
+            if (!row.prop('disabled')) {
+                row.toggle();
+            }
+        });
+
+        refresh();
 };
 
 var refresh = function () {
@@ -198,14 +277,18 @@ var refresh = function () {
         levelToField,
         damageField,
         artifactMax,
+        isDisabled,
+        isMaxLevel,
         costField,
         artifact,
+        row,
         i;
 
     upgradeCostSum = 0;
 
     for (i = 0; i < TT2.Artifacts.length; i++) {
         artifact = TT2.Artifacts[i];
+        row = $('#artrow' + artifact.id);
         currentInputField = $('.art_cur_input')[i];
         currentInputLevel = currentInputField.value ? +currentInputField.value : 0;
         levelToField = $('#atoi' + i);
@@ -213,6 +296,21 @@ var refresh = function () {
         costField = $('#a' + i);
         efficiencyField = $('#aeff' + i);
         damageField = $('#adam' + i);
+
+        isMaxLevel = artifact.maxLvl && ARTIFACT_LEVEL[artifact.id] >= artifact.maxLvl;
+
+        isDisabled = (HIDE_MAXIMIZED && isMaxLevel) || artifact.build.indexOf(buildFilter) === -1;
+        if (isDisabled) {
+            row.prop('disabled', true);
+        } else {
+            row.prop('disabled', false);
+        }
+
+        if (row.prop('disabled') || TIER_COLLAPSE[artifact.tier]) {
+            row.hide();
+        } else {
+            row.show();
+        }
 
         if (currentInputLevel >= 0) {
             costToUpgrade = TT2.artifactUpg1(i, currentInputLevel);
@@ -336,6 +434,20 @@ var setUpgradeToSum = function () {
     upgradeText += ' (' + TT2.numFormat(upgradeCost) + ')';
     upgradeHeaderField.text(upgradeText);
     prestigeHeaderField.text(prestigesText);
+};
+
+var refreshTierCollapse = function () {
+    var tierRows = $('.tier_header'),
+        tier,
+        row;
+
+    tierRows.each(function (index, domRow) {
+        row = $(domRow);
+        tier = row.prop('id');
+        if (TIER_COLLAPSE[tier[4]]) {
+            row.find('#tier_collapse').text('+');
+        }
+    });
 };
 
 init();

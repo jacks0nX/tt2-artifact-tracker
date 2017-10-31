@@ -10,9 +10,11 @@ var RELIC_PER_SEC_STORAGE_NAME = 'tt2_relic_per_sec',
     ART_TO_LV_STORAGE_NAME = 'tt2_art_to_lv_arr',
     SKILL_LEVEL_STORAGE_NAME = 'tt2_skill_lv_arr',
     CURRENT_RELICS_STORAGE_NAME = 'tt2_current_relics',
+    TIER_COLLAPSE_NAME = 'tt2_tier_collapse',
     ARTIFACT_TO_LEVEL = {},
     ARTIFACT_LEVEL = {},
     SKILL_LEVEL = {},
+    TIER_COLLAPSE = {},
     RELICS_FARM_STAGE = 0,
     RELICS_BEST_STAGE = 0,
     RELICS_PER_SEC = 0,
@@ -32,11 +34,13 @@ var initGlobalVariables = function () {
         levelTo = TT2.deserialize(ART_TO_LV_STORAGE_NAME),
         level = TT2.deserialize(ART_LV_STORAGE_NAME),
         skills = TT2.deserialize(SKILL_LEVEL_STORAGE_NAME),
-        relics = TT2.deserialize(CURRENT_RELICS_STORAGE_NAME);
+        relics = TT2.deserialize(CURRENT_RELICS_STORAGE_NAME),
+        tiers = TT2.deserialize(TIER_COLLAPSE_NAME);
 
     ARTIFACT_LEVEL = level || initEmptyArtifacts();
     ARTIFACT_TO_LEVEL = levelTo || initEmptyArtifacts();
     SKILL_LEVEL = skills || initEmptySkills();
+    TIER_COLLAPSE = tiers || initEmptyTiers();
 
     if (perSec) {
         RELICS_PER_SEC = perSec;
@@ -67,6 +71,7 @@ var saveGlobalArtifactVariables = function () {
     TT2.serialize(FARM_TIME_STORAGE_NAME, getFarmTimeSeconds());
     TT2.serialize(RELIC_PER_SEC_STORAGE_NAME, calcRelicsPerSecond());
     TT2.serialize(CURRENT_RELICS_STORAGE_NAME, getCurrentRelicsNumber());
+    TT2.serialize(TIER_COLLAPSE_NAME, TIER_COLLAPSE);
 };
 var saveGlobalSkillVariables = function () {
     TT2.serialize(SKILL_LEVEL_STORAGE_NAME, SKILL_LEVEL);
@@ -113,6 +118,15 @@ var initEmptySkills = function () {
         }
     }
 
+    return map;
+};
+var initEmptyTiers = function () {
+    var map = {};
+    map.A = false;
+    map.B = false;
+    map.C = false;
+    map.D = false;
+    map.E = false;
     return map;
 };
 
