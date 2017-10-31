@@ -28,6 +28,8 @@ var calculateNextArtifactCost = function (currentArtifact) {
                 return 59710000;
             case 49:
                 return 94320000;
+            case 50:
+                return 150000000;
         }
     }
 
