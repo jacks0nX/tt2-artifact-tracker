@@ -150,20 +150,37 @@ var currentRelicsInputValue = function (value) {
 };
 
 // CALCULATION
-// TODO update
 var calcRelicsFromStage = function () {
-    var exponentialTerm = relicCalcMult1 * Math.pow(relicCalcBase, Math.pow(RELICS_FARM_STAGE, relicCalcExpo)),
-        firstOrderTerm = relicCalcMult2 * (parseInt(RELICS_FARM_STAGE) + parseInt(relicCalcOffset)),
-        t = Math.max(Math.ceil(exponentialTerm + firstOrderTerm), 0),
-        bosLevel = ARTIFACT_LEVEL[1],
-        bosPerLevel = TT2.Artifacts[0].addupPerLvl,
-        e = bosPerLevel * parseInt(bosLevel),
-        a = a = Math.max(Math.ceil(t * e), 0),
-        l = t + a;
+    var stage = RELICS_FARM_STAGE,
+        bosEffect = TT2.artifactEff(0, ARTIFACT_LEVEL[1]),
+        baseRelics,
+        bosRelics,
+        summand1,
+        rounded,
+        factor,
+        relics;
 
-    RELICS_BEST_STAGE = l;
-    farmRelicsInputValue(RELICS_BEST_STAGE);
-    return l;
+    /*
+     * relics_2.2 = np.maximum(0,
+        np.round(
+            3 * 1.21^stage^0.48
+            + 1.5*(stage - 110)
+            + 1.002^stage^(1.005*(stage^1.1 * 5e-7 + 1))
+        ))
+     */
+
+    factor = 3 * Math.pow(1.21, Math.pow(stage, 0.48));
+    summand1 = 1.5 * (stage - 110);
+    summand2 = Math.pow(1.002, Math.pow(stage, (1.005 * (Math.pow(stage, 1.1) * 5e-7 + 1))));
+    rounded = Math.ceil(factor + summand1 + summand2);
+
+    baseRelics = Math.max(rounded, 0);
+    bosRelics = baseRelics *  bosEffect - baseRelics;
+    relics = baseRelics + bosRelics;
+
+    RELICS_BEST_STAGE = relics;
+    farmRelicsInputValue(relics);
+    return relics;
 };
 var calcRelicsPerSecond = function () {
     var relicsPerSec = RELICS_BEST_STAGE / getFarmTimeSeconds();
