@@ -153,13 +153,15 @@ var farmPerHourInputValue = function (value) {
     return inputValue('farm_per_hour', value);
 };
 var farmRelicsInputValue = function (value) {
+    if (value) {
+        value = TT2.numFormat(value);
+    }
     return inputValue('farm_relics', value);
 };
 var currentRelicsInputValue = function (value) {
     if (value) {
         value = TT2.numFormat(value);
     }
-
     return inputValue('current_relics', value);
 };
 

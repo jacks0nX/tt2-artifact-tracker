@@ -156,11 +156,11 @@ var initEvents = function () {
     $('.art_to_input').change(function () {
         refresh();
     });
-    $('.farm_stage').blur(function () {
+    $('.farm_stage').change(function () {
         RELICS_FARM_STAGE = farmStageInputValue();
         refresh();
     });
-    $('.farm_time').blur(function () {
+    $('.farm_time').change(function () {
         FARM_TIME = getFarmTimeSeconds();
         refresh();
     });
