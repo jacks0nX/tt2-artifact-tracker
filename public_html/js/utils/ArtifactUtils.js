@@ -402,7 +402,7 @@ var setEstimateTime = function (id, upgradeCost) {
         prestigeTime = numberOfPrestiges * FARM_TIME / 3600;
     }
 
-    $('#atce' + id).text(prestigeTime.toFixed(2));
+    $('#atce' + id).text(prestigeTime.toFixed(1));
 };
 
 var setEstimatePrestiges = function (id, upgradeCost) {

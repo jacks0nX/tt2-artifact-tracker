@@ -30,6 +30,26 @@ var calculateNextArtifactCost = function (currentArtifact) {
                 return 94320000;
             case 50:
                 return 150000000;
+            case 51:
+                return 238984254;
+            case 52:
+                return 383276658;
+            case 53:
+                return 617770000;
+            case 54:
+                return 1000762986;
+            case 55:
+                return 1629292101;
+            case 56:
+                return 2665833882;
+            case 57:
+                return 4383580899;
+            case 58:
+                return 7244059100;
+            case 59:
+                return 12030591780;
+            case 60:
+                return 20078853674;
         }
     }
 
@@ -57,6 +77,39 @@ var refreshArtNum = function (currentArtifact) {
         amountTime = amountTime.toFixed(2);
         $('#art_next_time').text(amountTime);
         $('#art_next_rest').text(amountPrestiges);
+
+        refreshNextArtEstimates(currentArtifact);
+
+    }
+};
+
+var refreshNextArtEstimates = function (currentArtifact) {
+    var estimateField,
+        prestiges = 0,
+        estimateText,
+        costField,
+        time = 0,
+        cost,
+        i;
+
+    for (i = currentArtifact + 1; i <= ARTIFACTS_AMOUNT; i++) {
+        costField = $('#nartid' + i);
+        estimateField = $('#narte' + i);
+        costField.addClass('half_size');
+
+        cost = calculateNextArtifactCost(i - 1);
+
+        prestiges = Math.ceil(cost / RELICS_BEST_STAGE);
+
+        if (RELICS_BEST_STAGE > 0) {
+            time = prestiges * FARM_TIME / 3600;
+        }
+
+        time = time.toFixed(1);
+        prestiges = TT2.numFormat(prestiges);
+
+        estimateText = '(' + time + 'h, ' + prestiges + ')';
+        estimateField.text(estimateText);
     }
 };
 
@@ -86,9 +139,15 @@ var initTableContent = function () {
                 appendString += artifactCounter;
                 artifactCounter++;
             } else {
+                appendString += '<div id="nartid' + artifactCalcCounter + '">';
                 value = calculateNextArtifactCost(artifactCalcCounter - 1);
                 value = TT2.numFormat(value);
                 appendString += value;
+                appendString += '</div>';
+
+                appendString += '<div id="narte' + artifactCalcCounter + '" class="half_size next_art_estimate">';
+                appendString += '</div>';
+
                 artifactCalcCounter++;
             }
 
