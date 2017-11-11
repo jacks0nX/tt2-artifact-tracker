@@ -5,55 +5,8 @@ var ARTIFACTS_AMOUNT = TT2.Artifacts.length,
     ARTIFACT_COST_INCREASE = 41;
 
 var calculateNextArtifactCost = function (currentArtifact) {
-    var nextArtifact = currentArtifact + 1,
-        increasedCost = currentArtifact >= ARTIFACT_COST_INCREASE;
-
-    if (increasedCost) {
-        switch (nextArtifact) {
-            case 41:
-                return 2630000;
-            case 42:
-                return 4270000;
-            case 43:
-                return 6540000;
-            case 44:
-                return 10080000;
-            case 45:
-                return 15610000;
-            case 46:
-                return 24290000;
-            case 47:
-                return 37980000;
-            case 48:
-                return 59710000;
-            case 49:
-                return 94320000;
-            case 50:
-                return 150000000;
-            case 51:
-                return 238984254;
-            case 52:
-                return 383276658;
-            case 53:
-                return 617770000;
-            case 54:
-                return 1000762986;
-            case 55:
-                return 1629292101;
-            case 56:
-                return 2665833882;
-            case 57:
-                return 4383580899;
-            case 58:
-                return 7244059100;
-            case 59:
-                return 12030591780;
-            case 60:
-                return 20078853674;
-        }
-    }
-
-    return nextArtifact * Math.pow(1.31, nextArtifact);
+    var nextArtifact = currentArtifact + 1;
+    return nextArtifact * (Math.pow(Math.max(1.31, 1.15 + (0.00395 * nextArtifact)), nextArtifact));
 };
 
 var refreshArtNum = function (currentArtifact) {
